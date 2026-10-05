@@ -170,6 +170,8 @@ body.login main{min-height:100vh;min-height:100dvh;justify-content:center;paddin
 .lbtn{all:unset;box-sizing:border-box;cursor:pointer;text-align:center;min-height:60px;padding:14px;border-radius:14px;border:2px solid #fff;color:#fff;font:700 1.15rem var(--body)}
 .lbtn:active{background:rgba(255,255,255,.15)}
 .lbtn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.lform input.pin{letter-spacing:.4em;font-size:1.4rem}
+.lform input.pin::placeholder{letter-spacing:normal;font-size:1.15rem}
 .lerr{margin:0;color:#fff;font-weight:700;text-align:center}
 </style>
 </head><body>
@@ -633,20 +635,22 @@ $("file").onchange=async e=>{
   }catch(err){ toast("No se ha podido leer ese archivo"); }
 };
 
+/* usuario + PIN: el usuario se convierte en email interno y el PIN en contraseña */
+const USER_DOMAIN="@interlama-crm.app", PIN_PREFIX="Interlama-";
 /* ---------- entrar / cargando / cuenta ---------- */
 V.login = () => ({t:"", s:"", h:`
   <form id="loginf" class="lform" novalidate>
-    <input type="email" id="l-e" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Email" aria-label="Email">
-    <input type="password" id="l-p" autocomplete="current-password" placeholder="Contraseña" aria-label="Contraseña">
+    <input type="text" id="l-e" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Usuario" aria-label="Usuario">
+    <input type="password" id="l-p" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="current-password" placeholder="PIN" aria-label="PIN" class="pin">
     <p class="lerr" id="l-err" role="alert" hidden></p>
     <button class="lbtn" type="submit" id="l-btn">Entrar</button>
   </form>`});
 V.cargando = () => ({t:"Clientes Interlama", s:"", h:`<p class="empty">Cargando tus clientes…</p>${(!sb||syncState==="off")?`<p class="banner">No hay conexión a internet. En cuanto vuelva, se cargarán tus clientes.</p><button class="btn" onclick="location.reload()">Reintentar</button>`:""}`});
 function accountBox(){
   const n=pending();
-  let h=`<h2 class="sec">Cuenta</h2><section class="box"><p class="hint">Has entrado como <strong>${esc(session?.user?.email||"")}</strong>. Todo se guarda en la nube y se ve igual en el móvil y en la tablet.</p>`;
+  let h=`<h2 class="sec">Cuenta</h2><section class="box"><p class="hint">Has entrado como <strong>${esc((session?.user?.email||"").replace(USER_DOMAIN,""))}</strong>. Todo se guarda en la nube y se ve igual en el móvil y en la tablet.</p>`;
   if(n) h+=`<p class="banner">Hay ${n} cambio${n>1?"s":""} esperando conexión para subirse.</p>`;
-  h+= ui.out ? `<div class="confirm"><strong>¿Cerrar sesión en este aparato?</strong>${n?`<span>Los cambios que no se han subido se perderán.</span>`:`<span>Para volver a entrar necesitarás el email y la contraseña.</span>`}<div class="row2"><button class="btn" data-outno>Cancelar</button><button class="btn pri" data-outyes>Sí, salir</button></div></div>`
+  h+= ui.out ? `<div class="confirm"><strong>¿Cerrar sesión en este aparato?</strong>${n?`<span>Los cambios que no se han subido se perderán.</span>`:`<span>Para volver a entrar necesitarás el usuario y el PIN.</span>`}<div class="row2"><button class="btn" data-outno>Cancelar</button><button class="btn pri" data-outyes>Sí, salir</button></div></div>`
              : `<button class="btn quiet" data-out>Cerrar sesión</button>`;
   return h+`</section>`;
 }
@@ -659,15 +663,17 @@ $("v").addEventListener("click", async e=>{
 function bindLogin(){
   const f=$("loginf"); if(!f) return;
   f.onsubmit=async e=>{ e.preventDefault();
-    const email=$("l-e").value.trim(), pass=$("l-p").value, err=$("l-err"), btn=$("l-btn");
+    const user=$("l-e").value.trim().toLowerCase(), pin=$("l-p").value.trim(), err=$("l-err"), btn=$("l-btn");
     const show=m=>{ err.textContent=m; err.hidden=false; };
-    if(!email||!pass) return show("Escribe el email y la contraseña.");
+    if(!user||!pin) return show("Escribe el usuario y el PIN.");
+    const email = user.includes("@") ? user : user+USER_DOMAIN, pass = PIN_PREFIX+pin;
     if(!sb) return show("No hay conexión a internet. Prueba otra vez en un momento.");
     btn.disabled=true; btn.textContent="Entrando…";
     const {error}=await sb.auth.signInWithPassword({email, password:pass});
     btn.disabled=false; btn.textContent="Entrar";
-    if(error) return show(/invalid/i.test(error.message)?"El email o la contraseña no son correctos.":"No se ha podido entrar. Revisa la conexión y prueba otra vez.");
+    if(error) return show(/invalid/i.test(error.message)?"El usuario o el PIN no son correctos.":"No se ha podido entrar. Revisa la conexión y prueba otra vez.");
   };
+  const p=$("l-p"); p.oninput=()=>{ p.value=p.value.replace(/\D/g,""); if(p.value.length===4 && $("l-e").value.trim()) f.requestSubmit(); };
 }
 
 /* ---------- arranque ---------- */
