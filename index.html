@@ -513,16 +513,17 @@ V.zonas = () => {
   const due = dueCount();
   let h = syncBanner();
   if(due) h += `<button class="big" data-tab="avisos" style="border-color:var(--orange)"><span><span class="bn">Tienes ${due} aviso${due>1?"s":""} para hoy</span><span class="bs">Toca para verlos</span></span><span class="bc">${due}</span></button>`;
-  h += `<h2 class="sec" style="margin-top:0">Mis rutas</h2><button class="btn pri" data-newruta>${ICON.plus}Crear ruta</button>`;
-  const rs=rutasOrd();
-  h += rs.length ? `<div class="grid">`+rs.map(r=>{ const cs=rutaClients(r), np=new Set(cs.map(c=>c.p)).size;
-      return `<button class="big sm" data-ruta="${r.id}"${r.fecha===today()?' style="border-color:var(--brand)"':""}><span><span class="bn">${esc(r.nombre)}</span><span class="bs">${esc(diaLabel(r.fecha))} · ${np} pueblo${np===1?"":"s"}</span></span><span class="bc">${cs.length}</span></button>`; }).join("")+`</div>`
-    : `<p class="hint">Todavía no tienes rutas. Crea una, elige los clientes de ese día y Google Maps te lleva de uno a otro.</p>`;
-  h += `<h2 class="sec">Por zonas</h2><p class="hint">Elige la zona donde vas a trabajar. Los pueblos saldrán ordenados por cercanía desde ${esc(title(DB.start))}.</p><div class="grid">`;
+  h += `<h2 class="sec" style="margin-top:0">Por zonas</h2><div class="grid">`;
   ZONAS.forEach(z=>{ const a=DB.clients.filter(c=>c.z===z); if(!a.length) return;
     const p=a.filter(c=>c.st==="pend").length;
     h+=`<button class="big" data-zona="${z}"><span><span class="bn">${z}</span><span class="bs">${p} pendientes · ${new Set(a.map(c=>c.p)).size} pueblos</span></span><span class="bc">${a.length}</span></button>`; });
   h += `</div>`;
+  h += `<h2 class="sec">Mis rutas</h2>`;
+  const rs=rutasOrd();
+  h += rs.length ? `<div class="grid">`+rs.map(r=>{ const cs=rutaClients(r), np=new Set(cs.map(c=>c.p)).size;
+      return `<button class="big sm" data-ruta="${r.id}"${r.fecha===today()?' style="border-color:var(--brand)"':""}><span><span class="bn">${esc(r.nombre)}</span><span class="bs">${esc(diaLabel(r.fecha))} · ${np} pueblo${np===1?"":"s"}</span></span><span class="bc">${cs.length}</span></button>`; }).join("")+`</div>`
+    : "";
+  h += `<button class="btn pri" data-newruta>${ICON.plus}Crear ruta</button>`;
   return {t:"Mi ruta", s:`${DB.clients.length} clientes`, h};
 };
 V.pueblos = ({z}) => {
