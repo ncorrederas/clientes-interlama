@@ -664,14 +664,12 @@ const MOTIVOS=["Visita comercial","Cobro","Revisión","Visita de cortesía","Ent
 let rap=null;
 const fmtYY = iso => { const [y,m,d]=iso.split("-"); return `${d}/${m}/${y.slice(2)}`; };
 const kmNum = v => { const n=parseInt(String(v??"").replace(/\D/g,""),10); return isNaN(n)?"":n; };
-function lastKm(fecha, exceptId){ const a=(DB.rapports||[]).filter(r=>r.id!==exceptId && r.fecha<=fecha && r.kmFin!=="" && r.kmFin!=null)
-  .sort((x,y)=>y.fecha.localeCompare(x.fecha)||(y.cr||"").localeCompare(x.cr||"")); return a[0]?a[0].kmFin:""; }
-const recTxt = () => { const a=kmNum(rap.kmIni), b=kmNum(rap.kmFin); if(a===""||b==="") return ""; return b<a ? "Los kilómetros al volver son menos que al salir. Revísalos." : `Recorridos: ${(b-a).toLocaleString("es-ES")} km`; };
+const rapKm = r => kmNum(r.km ?? r.kmFin ?? r.kmIni ?? "");
 const addLine = c => rap.lineas.push({cid:c.id, n:c.n, p:title(c.p), m:"Visita comercial"});
 V.rapport = () => {
   const rs=[...(DB.rapports||[])].sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.cr||"").localeCompare(a.cr||""));
   let h=`<button class="btn pri" data-newrap>${ICON.plus}Nuevo rapport</button>`;
-  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const a=kmNum(r.kmIni), b=kmNum(r.kmFin), km=a!==""&&b!==""?` · ${(b-a).toLocaleString("es-ES")} km`:"";
+  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const k=rapKm(r), km=k!==""?` · ${k.toLocaleString("es-ES")} km`:"";
     return `<button class="big sm" data-rap="${r.id}"><span><span class="bn">${esc(diaLabel(r.fecha))}</span><span class="bs">${fmtShort(r.fecha)}${km}</span></span><span class="bc">${r.lineas.length}</span></button>`; }).join("")+`</div>`;
   return {t:"Rapport", s:"Visitas del día para la empresa", h};
 };
@@ -695,7 +693,6 @@ V.rapEd = () => {
   const P=perfil();
   const h=`<section class="box">
     <label class="lbl">Día<input type="date" id="rp-f" value="${esc(rap.fecha)}"></label>
-    <label class="lbl">Kilómetros al salir <small>los que marca el coche</small><input type="text" inputmode="numeric" id="rp-ki" value="${esc(rap.kmIni)}" placeholder="Por ejemplo: 31123" autocomplete="off"></label>
     ${ui.perfil?`<label class="lbl">Nombre en el rapport<input type="text" id="pf-n" value="${esc(P.nombre)}" autocomplete="off"></label><label class="lbl">Matrícula<input type="text" id="pf-m" value="${esc(P.matricula)}" autocomplete="off"></label><button class="btn" data-perfilok>Guardar nombre y matrícula</button>`
       :`<p class="hint" style="font-size:.95rem">${esc(P.nombre)} · Matrícula ${esc(P.matricula)} · <button class="nedit" data-perfil>Cambiar</button></p>`}
   </section>
@@ -705,8 +702,8 @@ V.rapEd = () => {
   <h2 class="sec">Añadir clientes</h2>
   <div id="rqa" style="display:flex;flex-direction:column;gap:10px">${quickAdds()}</div>
   ${raddHtml()}
-  <h2 class="sec">Kilómetros al acabar</h2>
-  <section class="box"><label class="lbl">Kilómetros al volver<input type="text" inputmode="numeric" id="rp-kf" value="${esc(rap.kmFin)}" placeholder="Por ejemplo: 31290" autocomplete="off"></label><p class="hint" id="rp-rec" style="font-weight:700">${esc(recTxt())}</p></section>
+  <h2 class="sec">Kilómetros</h2>
+  <section class="box"><label class="lbl">Kilómetros del coche<input type="text" inputmode="numeric" id="rp-km" value="${esc(rap.km)}" placeholder="Por ejemplo: 31290" autocomplete="off"></label></section>
   <div class="savebar"><button class="btn pri" data-rappdf>${ICON.doc}Guardar y descargar PDF</button></div>
   <button class="btn" data-rapsave>Guardar sin descargar</button>
   ${!rap.id?"":ui.delRap?`<div class="confirm"><strong>¿Borrar este rapport?</strong><div class="row2"><button class="btn" data-delrapno>Cancelar</button><button class="btn pri" data-delrapyes>Sí, borrar</button></div></div>`:`<button class="btn danger" data-delrap>${ICON.trash}Borrar rapport</button>`}`;
@@ -715,7 +712,7 @@ V.rapEd = () => {
 function rapSave(){
   rap.lineas=rap.lineas.filter(l=>(l.n||"").trim()).map(l=>({...l, n:l.n.trim(), p:(l.p||"").trim(), m:(l.m||"").trim()}));
   if(!rap.lineas.length){ refreshRuta(); toast("Añade al menos un cliente"); return null; }
-  const r={id:rap.id||uuid(), fecha:rap.fecha||today(), kmIni:kmNum(rap.kmIni), kmFin:kmNum(rap.kmFin), lineas:rap.lineas, cr:rap.cr||new Date().toISOString()};
+  const r={id:rap.id||uuid(), fecha:rap.fecha||today(), km:kmNum(rap.km), lineas:rap.lineas, cr:rap.cr||new Date().toISOString()};
   DB.rapports=DB.rapports||[]; const k=DB.rapports.findIndex(x=>x.id===r.id); if(k>=0) DB.rapports[k]=r; else DB.rapports.push(r);
   markDirty("rapports"); save(); rap=JSON.parse(JSON.stringify(r)); return r;
 }
@@ -736,7 +733,7 @@ function rapPdf(r){
   txt(String(P.nombre).toUpperCase(), 100, top+6, 13);
   txt(fmtYY(r.fecha), R, top+15, 13, {align:"right"});
   txt("MATRICULA:", L, top+24, 10); txt(String(P.matricula), L+25, top+24, 10);
-  doc.setLineWidth(.3); doc.rect(100, top+18, R-100, 8); txt(`KILOMETROS  ${r.kmIni===""?"":r.kmIni}`, 102, top+24, 13);
+  doc.setLineWidth(.3); doc.rect(100, top+18, R-100, 8); txt(`KILOMETROS  ${r.km===""||r.km==null?"":r.km}`, 102, top+24, 13);
   let y=top+32;
   const head=()=>{ doc.setLineWidth(.5); doc.rect(L,y,R-L,6); doc.line(X[1],y,X[1],y+6); doc.line(X[2],y,X[2],y+6);
     txt("CLIENTE",X[0]+1.5,y+4.3,8.5); txt("POBLACION",X[1]+1.5,y+4.3,8.5); txt("MOTIVO DE LA VISITA  / OBSERVACIONES",X[2]+1.5,y+4.3,8.5); y+=6; doc.setLineWidth(.3); };
@@ -751,8 +748,6 @@ function rapPdf(r){
     doc.setFont("helvetica","normal"); doc.setFontSize(11);
     if(row.a.length) doc.text(row.a,X[0]+1.5,y+6.5); if(row.b.length) doc.text(row.b,X[1]+1.5,y+6.5); if(row.c.length) doc.text(row.c,X[2]+1.5,y+6.5);
     y+=row.h; }
-  if(y+18>290){ doc.addPage(); y=top; }
-  doc.rect(100,y+8,R-100,8); txt(`KILOMETROS : ${r.kmFin===""?"":r.kmFin}`,102,y+14,13);
   return doc.output("arraybuffer");
 }
 async function rapDownload(){
@@ -996,8 +991,7 @@ function render(reset){
     const q=$("rq"); if(q) q.oninput=e=>{ rq=e.target.value; $("rres").innerHTML=rresHtml(); }; }
   if(view.v==="rapEd" && rap){
     $("rp-f").onchange=e=>{ rap.fecha=e.target.value||today(); render(); };
-    $("rp-ki").oninput=e=>{ rap.kmIni=e.target.value; $("rp-rec").textContent=recTxt(); };
-    $("rp-kf").oninput=e=>{ rap.kmFin=e.target.value; $("rp-rec").textContent=recTxt(); };
+    $("rp-km").oninput=e=>{ rap.km=e.target.value; };
     const q=$("rq"); if(q) q.oninput=e=>{ rq=e.target.value; $("rres").innerHTML=rresHtml(); }; }
   if(view.v==="ajustes"){ $("start").onchange=e=>{ DB.start=e.target.value; save(); toast("Salida: "+title(DB.start)); }; }
   if(view.v==="form"){ const p=$("f-p"); p.oninput=()=>{ const z=PZ[p.value.trim().toUpperCase()]; if(z) $("f-z").value=z; }; }
@@ -1017,8 +1011,8 @@ $("v").onclick=async e=>{
   if(b.hasAttribute("data-delruta")){ ui.delRuta=true; return render(); }
   if(b.hasAttribute("data-delrutano")){ ui.delRuta=false; return render(); }
   if(b.hasAttribute("data-delrutayes")){ DB.rutas=DB.rutas.filter(r=>r.id!==view.rid); markDirty("rutas"); save(); stack=[{v:"zonas"}]; ui={}; render(true); return toast("Ruta borrada"); }
-  if(b.hasAttribute("data-newrap")){ const f=today(); rap={id:null, fecha:f, kmIni:lastKm(f,null), kmFin:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
-  if(d.rap){ const r=(DB.rapports||[]).find(x=>x.id===d.rap); if(!r) return; rap=JSON.parse(JSON.stringify(r)); rq=""; return go({v:"rapEd"}); }
+  if(b.hasAttribute("data-newrap")){ const f=today(); rap={id:null, fecha:f, km:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
+  if(d.rap){ const r=(DB.rapports||[]).find(x=>x.id===d.rap); if(!r) return; rap=JSON.parse(JSON.stringify(r)); rap.km=rapKm(r); rq=""; return go({v:"rapEd"}); }
   if(rap && view.v==="rapEd"){
     if(d.rmode){ rmode=d.rmode; return render(); }
     if(d.rz){ rzona = rzona===d.rz ? "" : d.rz; rpueblo=""; return render(); }
