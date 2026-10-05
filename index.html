@@ -149,8 +149,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand)}
 .confirm{background:var(--orange-bg);color:var(--fg);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .empty{color:var(--muted);text-align:center;padding:30px 10px}
 
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tab{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px 10px;font-weight:700;font-size:.9rem;color:var(--muted);position:relative;min-height:62px;justify-content:center}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 10px;font-weight:700;font-size:.85rem;color:var(--muted);position:relative;min-height:62px;justify-content:center}
 .tab svg{width:28px;height:28px}
 .tab[aria-current="true"]{color:var(--brand)}
 .tab.new .plus{width:44px;height:44px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center}
@@ -217,6 +217,27 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand)}
 .orders .ox{all:unset;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--muted)}
 .orders .ox svg{width:18px;height:18px}
 
+/* pantalla de Ruta sin cabecera roja: más espacio en el móvil */
+body.nohead .top{display:none}
+body.nohead main{padding-top:calc(16px + env(safe-area-inset-top,0px))}
+/* rutas guardadas */
+.rlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.rrow{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:8px 8px 8px 12px;display:flex;align-items:center;gap:10px}
+.rrow .stop{margin:0;flex:0 0 auto}
+.rn{flex:1;min-width:0;display:flex;flex-direction:column}
+.rn b{font:700 1.15rem/1.15 var(--display);overflow-wrap:anywhere}
+.rn small{color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}
+.rctl{display:flex;gap:4px;flex:0 0 auto}
+.ib{all:unset;cursor:pointer;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid var(--line);color:var(--fg)}
+.ib svg{width:20px;height:20px}
+.ib[disabled]{opacity:.3;cursor:default}
+.ib.x{color:var(--brand)}
+.addb{all:unset;cursor:pointer;flex:0 0 auto;padding:10px 14px;border-radius:12px;font-weight:700;font-size:.95rem;border:2px solid var(--brand);color:var(--brand);white-space:nowrap}
+.addb[aria-pressed="true"]{background:var(--s-ped-bg);color:var(--s-ped);border-color:var(--s-ped)}
+.rstop{font-weight:700;color:var(--muted);font-size:.95rem;margin:6px 0 -6px;display:flex;align-items:center;gap:4px}
+.savebar{position:sticky;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;flex-direction:column;gap:8px;padding:10px 0 0;background:linear-gradient(to bottom,transparent,var(--bg) 30%)}
+.pills .pill[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
 /* pantalla de entrada: solo fondo rojo y los campos */
 body.login{background:var(--brand)}
 body.login .top{display:none}
@@ -236,7 +257,6 @@ body.login main{min-height:100vh;min-height:100dvh;justify-content:center;paddin
 <header class="top">
   <button class="back" id="back" hidden aria-label="Volver"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Volver</button>
   <div class="ttl"><h1 id="ttl">Mi ruta</h1><p id="sub"></p></div>
-  <button class="gear" id="gear" hidden aria-label="Ajustes y copia de seguridad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M10.3 3h3.4l.5 2.5 1.8.8 2.2-1.4 2.4 2.4-1.4 2.2.8 1.8 2.5.5v3.4l-2.5.5-.8 1.8 1.4 2.2-2.4 2.4-2.2-1.4-1.8.8-.5 2.5h-3.4l-.5-2.5-1.8-.8-2.2 1.4-2.4-2.4 1.4-2.2-.8-1.8L1.5 13.7v-3.4l2.5-.5.8-1.8-1.4-2.2 2.4-2.4 2.2 1.4 1.8-.8z"/><circle cx="12" cy="12" r="3.2"/></svg></button>
 </header>
 
 <main id="v"></main>
@@ -245,6 +265,7 @@ body.login main{min-height:100vh;min-height:100dvh;justify-content:center;paddin
   <button class="tab" data-tab="ruta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Ruta</button>
   <button class="tab" data-tab="avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Avisos<span class="badge" id="badge" hidden></span></button>
   <button class="tab" data-tab="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar</button>
+  <button class="tab" data-tab="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M10.3 3h3.4l.5 2.5 1.8.8 2.2-1.4 2.4 2.4-1.4 2.2.8 1.8 2.5.5v3.4l-2.5.5-.8 1.8 1.4 2.2-2.4 2.4-2.2-1.4-1.8.8-.5 2.5h-3.4l-.5-2.5-1.8-.8-2.2 1.4-2.4-2.4 1.4-2.2-.8-1.8L1.5 13.7v-3.4l2.5-.5.8-1.8-1.4-2.2 2.4-2.4 2.2 1.4 1.8-.8z"/><circle cx="12" cy="12" r="3.2"/></svg>Ajustes</button>
   <button class="tab new" data-tab="nuevo"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Nuevo</button>
 </nav>
 <div id="sheet"></div>
@@ -265,7 +286,13 @@ const ICON = {
   pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
   euro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 6.5A6.5 6.5 0 1 0 17 17.5"/><path d="M4.5 10.5h9M4.5 13.5h9"/></svg>',
-  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l6-6 6 6"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10l6 6 6-6"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  sort:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="6" r="2.2"/><path d="M8 18h5a3 3 0 0 0 0-6h-2a3 3 0 0 1 0-6h5"/></svg>'
 };
 
 /* ---------- ubicación de los pueblos (centro del municipio, aproximado) ---------- */
@@ -295,7 +322,7 @@ const SB_KEY = "sb_publishable_48ZUCL9AdmJlgEyTgZ9ZtA_GKrpKLuU";
 const CACHE = "interlama-crm-cloud-v1";
 const hex12 = n => n.toString(16).padStart(12,"0");
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx".replace(/x/g,()=>(Math.random()*16|0).toString(16)));
-let DB={clients:[], lastExport:"", start:"PINEDA DE MAR"}, canStore=true;
+let DB={clients:[], lastExport:"", start:"PINEDA DE MAR", rutas:[]}, canStore=true;
 let SYNCED={clients:{}, notes:{}, orders:{}, start:null};
 let sb=null, session=null, READY=false, syncState="ok", syncTimer=null, retryTimer=null;
 
@@ -303,10 +330,20 @@ function cacheLocal(){ try{ localStorage.setItem(CACHE, JSON.stringify({DB, SYNC
 function loadCache(uid){
   try{ const raw=localStorage.getItem(CACHE); if(!raw) return false; const o=JSON.parse(raw);
     if(!o || !o.DB || !Array.isArray(o.DB.clients) || (uid && o.who && o.who!==uid)) return false;
-    DB=o.DB; SYNCED=o.SYNCED||{clients:{},notes:{},start:null}; SYNCED.orders=SYNCED.orders||{}; DB.clients.forEach(c=>{ c.ord=c.ord||[]; }); if(!GEO[DB.start]) DB.start="PINEDA DE MAR"; return true;
+    DB=o.DB; SYNCED=o.SYNCED||{clients:{},notes:{},start:null}; SYNCED.orders=SYNCED.orders||{}; DB.clients.forEach(c=>{ c.ord=c.ord||[]; }); DB.rutas=DB.rutas||[]; if(!GEO[DB.start]) DB.start="PINEDA DE MAR"; return true;
   }catch(e){ return false; }
 }
-function save(){ cacheLocal(); clearTimeout(syncTimer); syncTimer=setTimeout(flush, 300); }
+function save(){ cacheLocal(); clearTimeout(syncTimer); syncTimer=setTimeout(()=>{ flush(); pushRutas(); }, 300); }
+/* las rutas se guardan en la tabla «ajustes» (clave «rutas»), así se ven en todos los aparatos */
+let rutasBusy=false;
+async function pushRutas(){
+  if(!sb || !session || !DB.rutasDirty || rutasBusy) return; rutasBusy=true;
+  const v=JSON.stringify(DB.rutas||[]);
+  try{ const {error}=await sb.from("ajustes").upsert({clave:"rutas", valor:v}); if(error) throw error;
+    SYNCED.rutas=v; if(JSON.stringify(DB.rutas||[])===v) DB.rutasDirty=false; cacheLocal(); }
+  catch(err){ console.warn("rutas", err); }
+  finally{ rutasBusy=false; }
+}
 
 const rowOf = c => ({id:c.id, codigo:c.c||"", nombre:c.n, contacto:c.r||"", telefono:c.t||"", email:c.e||"", pueblo:c.p||"",
   zona:c.z||"Fuera de zona", estado:c.st||"pend", volver_llamar:c.rec||null});
@@ -384,6 +421,10 @@ async function pull(){
   DB.clients=cs.map(r=>({id:r.id, c:r.codigo, n:r.nombre, r:r.contacto, t:r.telefono, e:r.email, p:r.pueblo, z:r.zona, st:r.estado, rec:r.volver_llamar||"", notes:byC[r.id]||[], ord:byO[r.id]||[]}));
   const sal=as.find(a=>a.clave==="salida"); DB.start = sal && GEO[sal.valor] ? sal.valor : (DB.start||"PINEDA DE MAR");
   SYNCED={clients:{}, notes:{}, orders:{}, start: sal?sal.valor:null};
+  const ru=as.find(a=>a.clave==="rutas");
+  if(ru){ SYNCED.rutas = typeof ru.valor==="string" ? ru.valor : JSON.stringify(ru.valor);
+    if(!DB.rutasDirty){ try{ const v=typeof ru.valor==="string"?JSON.parse(ru.valor):ru.valor; if(Array.isArray(v)) DB.rutas=v; }catch(e){} } }
+  DB.rutas=DB.rutas||[]; if(DB.rutasDirty) pushRutas();
   DB.clients.forEach(c=>{ SYNCED.clients[c.id]=JSON.stringify(rowOf(c)); c.notes.forEach(n=>SYNCED.notes[n.id]=JSON.stringify(noteRow(c,n))); c.ord.forEach(o=>SYNCED.orders[o.id]=JSON.stringify(ordRow(c,o))); });
   /* los antiguos «Volver a llamar» pasan a ser notas con aviso */
   let moved=0; DB.clients.forEach(c=>{ if(c.rec){ c.notes.push(newNote("Volver a llamar", c.rec)); c.rec=""; moved++; } });
@@ -395,7 +436,7 @@ async function pull(){
 
 function logoutLocal(){
   try{ localStorage.removeItem(CACHE); }catch(e){}
-  session=null; READY=false; DB={clients:[], lastExport:"", start:"PINEDA DE MAR"}; SYNCED={clients:{},notes:{},orders:{},start:null}; sheet=null; micKill();
+  session=null; READY=false; DB={clients:[], lastExport:"", start:"PINEDA DE MAR", rutas:[]}; SYNCED={clients:{},notes:{},orders:{},start:null}; sheet=null; micKill();
   tab="ruta"; stack=[{v:"zonas"}]; ui={}; render(true);
 }
 
@@ -436,7 +477,7 @@ let sheet=null;
 function go(view){ micKill(); sheet=null; stack.push(view); ui={}; render(true); }
 function back(){ micKill(); sheet=null; if(stack.length>1){ stack.pop(); ui={}; render(true); } }
 function setTab(t){ micKill(); sheet=null; tab=t; ui={};
-  stack = t==="ruta"?[{v:"zonas"}] : t==="avisos"?[{v:"avisos"}] : t==="buscar"?[{v:"buscar"}] : [{v:"form",id:null}];
+  stack = t==="ruta"?[{v:"zonas"}] : t==="avisos"?[{v:"avisos"}] : t==="buscar"?[{v:"buscar"}] : t==="ajustes"?[{v:"ajustes"}] : [{v:"form",id:null}];
   render(true); }
 
 /* ---------- piezas ---------- */
@@ -472,11 +513,17 @@ V.zonas = () => {
   const due = dueCount();
   let h = syncBanner();
   if(due) h += `<button class="big" data-tab="avisos" style="border-color:var(--orange)"><span><span class="bn">Tienes ${due} aviso${due>1?"s":""} para hoy</span><span class="bs">Toca para verlos</span></span><span class="bc">${due}</span></button>`;
-  h += `<p class="hint">Elige la zona donde vas a trabajar. Los pueblos saldrán ordenados por cercanía desde ${esc(title(DB.start))}.</p><div class="grid">`;
+  h += `<h2 class="sec" style="margin-top:0">Por zonas</h2><div class="grid">`;
   ZONAS.forEach(z=>{ const a=DB.clients.filter(c=>c.z===z); if(!a.length) return;
     const p=a.filter(c=>c.st==="pend").length;
     h+=`<button class="big" data-zona="${z}"><span><span class="bn">${z}</span><span class="bs">${p} pendientes · ${new Set(a.map(c=>c.p)).size} pueblos</span></span><span class="bc">${a.length}</span></button>`; });
   h += `</div>`;
+  h += `<h2 class="sec">Mis rutas</h2>`;
+  const rs=rutasOrd();
+  h += rs.length ? `<div class="grid">`+rs.map(r=>{ const cs=rutaClients(r), np=new Set(cs.map(c=>c.p)).size;
+      return `<button class="big sm" data-ruta="${r.id}"${r.fecha===today()?' style="border-color:var(--brand)"':""}><span><span class="bn">${esc(r.nombre)}</span><span class="bs">${esc(diaLabel(r.fecha))} · ${np} pueblo${np===1?"":"s"}</span></span><span class="bc">${cs.length}</span></button>`; }).join("")+`</div>`
+    : "";
+  h += `<button class="btn pri" data-newruta>${ICON.plus}Crear ruta</button>`;
   return {t:"Mi ruta", s:`${DB.clients.length} clientes`, h};
 };
 V.pueblos = ({z}) => {
@@ -512,6 +559,90 @@ V.lista = (view) => {
     `<div id="lres" style="display:flex;flex-direction:column;gap:14px">${body.h}</div>`;
   return {t:p?title(p):"Ruta · "+z, s:body.sub, h};
 };
+/* ---------- rutas guardadas ---------- */
+const rutaById = id => (DB.rutas||[]).find(r=>r.id===id);
+const rutaClients = r => r.ids.map(byId).filter(Boolean);
+const diaLabel = f => !f ? "Sin día" : f===today() ? "Hoy" : f===addDays(1) ? "Mañana" : fmtLong(f);
+function rutasOrd(){ const t=today(), a=[...(DB.rutas||[])];
+  const fut=a.filter(r=>(r.fecha||"")>=t).sort((x,y)=>x.fecha.localeCompare(y.fecha));
+  const pas=a.filter(r=>!((r.fecha||"")>=t)).sort((x,y)=>(y.fecha||"").localeCompare(x.fecha||""));
+  return [...fut, ...pas]; }
+/* ordena los clientes por cercanía: pueblo más cercano a la salida, luego el más cercano a ese, etc. */
+function sortIds(ids){ const cs=ids.map(byId).filter(Boolean), ps=[...new Set(cs.map(c=>c.p))];
+  return routeOrder(ps).flatMap(s=>cs.filter(c=>c.p===s.p).map(c=>c.id)); }
+/* Google Maps: el cliente se busca por su nombre y pueblo. Máximo 10 paradas por enlace. */
+const placeQ = c => encodeURIComponent(`${c.n}, ${title(c.p)}`);
+function mapsLeg(origin, stops){ const dest=stops[stops.length-1], way=stops.slice(0,-1);
+  return `https://www.google.com/maps/dir/?api=1${origin?"&origin="+placeQ(origin):""}&destination=${placeQ(dest)}${way.length?"&waypoints="+way.map(placeQ).join("%7C"):""}&travelmode=driving`; }
+function mapsBtns(cs){
+  if(!cs.length) return "";
+  if(cs.length<=10) return `<a class="btn pri" href="${mapsLeg(null,cs)}" target="_blank" rel="noopener">${ICON.pin}Ir con Google Maps</a><p class="hint" style="font-size:.95rem;margin-top:-6px">Sale desde donde estés y pasa por los ${cs.length} clientes en este orden.</p>`;
+  let h=`<p class="hint" style="font-size:.95rem">Google Maps admite 10 paradas por viaje, así que la ruta va en tramos. Abre el siguiente cuando acabes uno.</p>`;
+  for(let i=0;i<cs.length;i+=10){ const leg=cs.slice(i,i+10);
+    h+=`<a class="btn${i?"":" pri"}" href="${mapsLeg(i?cs[i-1]:null,leg)}" target="_blank" rel="noopener">${ICON.pin}Tramo ${i/10+1}: paradas ${i+1} a ${i+leg.length}</a>`; }
+  return h;
+}
+V.ruta = ({rid}) => {
+  const r=rutaById(rid); if(!r) return {t:"Ruta", s:"", h:`<p class="empty">Esta ruta ya no existe.</p>`};
+  const cs=rutaClients(r);
+  let h=mapsBtns(cs)+`<button class="btn" data-editruta="${r.id}">${ICON.pen}Cambiar clientes u orden</button>`;
+  if(!cs.length) h+=`<p class="empty">Esta ruta no tiene clientes.</p>`;
+  cs.forEach((c,i)=>{ h+=`<div class="rstop"><span class="stop">${i+1}</span>${esc(title(c.p))}</div>`+card(c); });
+  h += ui.delRuta ? `<div class="confirm"><strong>¿Borrar la ruta «${esc(r.nombre)}»?</strong><span>Los clientes no se borran, solo la ruta.</span><div class="row2"><button class="btn" data-delrutano>Cancelar</button><button class="btn pri" data-delrutayes>Sí, borrar</button></div></div>`
+                  : `<button class="btn danger" data-delruta>${ICON.trash}Borrar ruta</button>`;
+  return {t:r.nombre, s:`${diaLabel(r.fecha)} · ${cs.length} cliente${cs.length===1?"":"s"}`, h};
+};
+/* editor de ruta: se trabaja sobre una copia (draft) y se guarda al final */
+let draft=null, rmode="buscar", rzona="", rpueblo="", rq="";
+function rselHtml(){
+  const cs=draft.ids.map(byId).filter(Boolean);
+  if(!cs.length) return `<p class="hint">Todavía no hay clientes. Añádelos abajo buscando por nombre o por zona y pueblo.</p>`;
+  return (cs.length>1?`<button class="btn" data-rsort>${ICON.sort}Ordenar por cercanía desde ${esc(title(DB.start))}</button>`:"")+
+    `<ol class="rlist">${cs.map((c,i)=>`<li class="rrow"><span class="stop">${i+1}</span><span class="rn"><b>${esc(c.n)}</b><small>${esc(title(c.p))}</small></span><span class="rctl">
+      <button class="ib" data-rup="${c.id}" aria-label="Subir ${esc(c.n)}"${i?"":" disabled"}>${ICON.up}</button>
+      <button class="ib" data-rdown="${c.id}" aria-label="Bajar ${esc(c.n)}"${i<cs.length-1?"":" disabled"}>${ICON.down}</button>
+      <button class="ib x" data-rdel="${c.id}" aria-label="Quitar ${esc(c.n)} de la ruta">${ICON.x}</button></span></li>`).join("")}</ol>`;
+}
+function rrow(c){ const on=draft.ids.includes(c.id);
+  return `<li class="rrow"><span class="rn"><b>${esc(c.n)}</b><small>${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""} · ${EST[c.st]}</small></span><button class="addb" data-rtog="${c.id}" aria-pressed="${on}">${on?"✓ En la ruta":"+ Añadir"}</button></li>`; }
+function rresHtml(){
+  if(rmode==="buscar"){
+    const q=norm(rq.trim()), qd=q.replace(/\D/g,"");
+    if(q.length<2) return `<p class="hint">Escribe al menos 2 letras del nombre, el pueblo o el teléfono.</p>`;
+    const r=DB.clients.filter(c=>norm(c.n+" "+c.r+" "+c.p+" "+c.c).includes(q) || (qd.length>=3 && String(c.t||"").replace(/\D/g,"").includes(qd))).sort(sortN);
+    if(!r.length) return `<p class="empty">Ningún cliente coincide con «${esc(rq.trim())}».</p>`;
+    return (r.length>40?`<p class="hint">Mostrando 40 de ${r.length}. Escribe algo más concreto.</p>`:"")+`<ul class="rlist">${r.slice(0,40).map(rrow).join("")}</ul>`;
+  }
+  if(!rzona) return `<p class="hint">Elige una zona.</p>`;
+  if(!rpueblo) return `<p class="hint">Elige un pueblo.</p>`;
+  const r=DB.clients.filter(c=>c.z===rzona && c.p===rpueblo).sort(sortN), left=r.filter(c=>!draft.ids.includes(c.id)).length;
+  return (left?`<button class="btn" data-rall>${ICON.plus}Añadir los ${left} que faltan de ${esc(title(rpueblo))}</button>`:"")+`<ul class="rlist">${r.map(rrow).join("")}</ul>`;
+}
+function raddHtml(){
+  let h=`<div class="chips" role="group" aria-label="Cómo añadir"><button class="chip" data-rmode="buscar" aria-pressed="${rmode==="buscar"}">Buscar por nombre</button><button class="chip" data-rmode="zona" aria-pressed="${rmode==="zona"}">Por zona y pueblo</button></div>`;
+  if(rmode==="buscar") h+=`<div class="lsearch"><input type="search" id="rq" placeholder="Nombre del cliente…" value="${esc(rq)}" autocomplete="off" aria-label="Buscar cliente para añadir"></div>`;
+  else {
+    h+=`<div class="pills">${ZONAS.filter(z=>DB.clients.some(c=>c.z===z)).map(z=>`<button class="pill" data-rz="${z}" aria-pressed="${rzona===z}">${z}</button>`).join("")}</div>`;
+    if(rzona){ const ps=[...new Set(DB.clients.filter(c=>c.z===rzona).map(c=>c.p))];
+      h+=`<p class="ord" style="margin:0">Pueblos ordenados por cercanía desde ${esc(title(DB.start))}</p><div class="pills">${routeOrder(ps).map(s=>`<button class="pill" data-rp="${esc(s.p)}" aria-pressed="${rpueblo===s.p}">${esc(title(s.p))}</button>`).join("")}</div>`; }
+  }
+  return h+`<div id="rres" style="display:flex;flex-direction:column;gap:10px">${rresHtml()}</div>`;
+}
+V.rutaEd = () => {
+  if(!draft) return {t:"Ruta", s:"", h:`<p class="empty">No hay ninguna ruta abierta.</p>`};
+  const h=`<section class="box">
+    <label class="lbl">Nombre de la ruta<input type="text" id="r-n" value="${esc(draft.nombre)}" placeholder="Por ejemplo: Maresme martes" autocomplete="off"></label>
+    <label class="lbl">Día<input type="date" id="r-f" value="${esc(draft.fecha||"")}"></label>
+  </section>
+  <h2 class="sec">En la ruta · <span id="rcount">${draft.ids.length}</span></h2>
+  <div id="rsel" style="display:flex;flex-direction:column;gap:10px">${rselHtml()}</div>
+  <h2 class="sec">Añadir clientes</h2>
+  ${raddHtml()}
+  <div class="savebar"><button class="btn pri" data-saveruta>${ICON.check}Guardar ruta</button></div>`;
+  return {t:draft.id?"Editar ruta":"Nueva ruta", s:"Elige los clientes y el orden", h};
+};
+function refreshRuta(){ const a=$("rsel"); if(a) a.innerHTML=rselHtml(); const n=$("rcount"); if(n) n.textContent=draft.ids.length; const r=$("rres"); if(r) r.innerHTML=rresHtml(); }
+
 V.avisos = () => {
   const t=today(), all=[];
   DB.clients.forEach(c=>pendNotes(c).forEach(n=>all.push({c,n})));
@@ -727,7 +858,7 @@ function render(reset){
   $("back").hidden = stack.length<2 || !READY || !session;
   document.querySelector(".tabs").hidden = !session || !READY;
   document.body.classList.toggle("login", view.v==="login");
-  $("gear").hidden = !(view.v==="zonas");
+  document.body.classList.toggle("nohead", view.v==="zonas");
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-current", b.dataset.tab===tab));
   const due=session&&READY?dueCount():0;
   $("badge").hidden=!due; $("badge").textContent=due;
@@ -739,19 +870,44 @@ function render(reset){
   if(view.v==="lista"){ const q=$("lq"); q.oninput=e=>{ listQ=e.target.value; const r=listaBody(view); $("lres").innerHTML=r.h; $("sub").textContent=r.sub;
       const has=!!listQ, btn=document.querySelector("[data-lclear]");
       if(has && !btn) q.insertAdjacentHTML("afterend",`<button class="lclear" data-lclear aria-label="Borrar búsqueda">×</button>`); if(!has && btn) btn.remove(); }; }
+  if(view.v==="rutaEd" && draft){
+    $("r-n").oninput=e=>{ draft.nombre=e.target.value; }; $("r-f").onchange=e=>{ draft.fecha=e.target.value; };
+    const q=$("rq"); if(q) q.oninput=e=>{ rq=e.target.value; $("rres").innerHTML=rresHtml(); }; }
   if(view.v==="ajustes"){ $("start").onchange=e=>{ DB.start=e.target.value; save(); toast("Salida: "+title(DB.start)); }; }
   if(view.v==="form"){ const p=$("f-p"); p.oninput=()=>{ const z=PZ[p.value.trim().toUpperCase()]; if(z) $("f-z").value=z; }; }
 }
 
 /* ---------- acciones ---------- */
 $("back").onclick=back;
-$("gear").onclick=()=>go({v:"ajustes"});
 document.querySelector(".tabs").onclick=e=>{ const b=e.target.closest("[data-tab]"); if(b) setTab(b.dataset.tab); };
 $("v").onclick=async e=>{
   const b=e.target.closest("button,a"); if(!b) return;
   const d=b.dataset, view=cur(), c=view.id?byId(view.id):null;
   if(d.tab) return setTab(d.tab);
   if(d.zona) return go({v:"pueblos",z:d.zona});
+  if(b.hasAttribute("data-newruta")){ draft={id:null, nombre:"", fecha:today(), ids:[]}; rq=""; rpueblo=""; return go({v:"rutaEd"}); }
+  if(d.ruta) return go({v:"ruta",rid:d.ruta});
+  if(d.editruta){ const r=rutaById(d.editruta); if(!r) return; draft=JSON.parse(JSON.stringify(r)); rq=""; return go({v:"rutaEd"}); }
+  if(b.hasAttribute("data-delruta")){ ui.delRuta=true; return render(); }
+  if(b.hasAttribute("data-delrutano")){ ui.delRuta=false; return render(); }
+  if(b.hasAttribute("data-delrutayes")){ DB.rutas=DB.rutas.filter(r=>r.id!==view.rid); DB.rutasDirty=true; save(); stack=[{v:"zonas"}]; ui={}; render(true); return toast("Ruta borrada"); }
+  if(draft && view.v==="rutaEd"){
+    if(d.rmode){ rmode=d.rmode; return render(); }
+    if(d.rz){ rzona = rzona===d.rz ? "" : d.rz; rpueblo=""; return render(); }
+    if(d.rp){ rpueblo = rpueblo===d.rp ? "" : d.rp; return render(); }
+    if(d.rtog){ const i=draft.ids.indexOf(d.rtog); if(i>=0) draft.ids.splice(i,1); else draft.ids.push(d.rtog); refreshRuta(); return toast(i>=0?"Quitado de la ruta":"Añadido a la ruta · parada "+draft.ids.length); }
+    if(b.hasAttribute("data-rall")){ const add=DB.clients.filter(c=>c.z===rzona && c.p===rpueblo && !draft.ids.includes(c.id)).sort(sortN).map(c=>c.id); draft.ids.push(...add); refreshRuta(); return toast(add.length+" añadidos a la ruta"); }
+    if(d.rup||d.rdown){ const id=d.rup||d.rdown, i=draft.ids.indexOf(id), j=d.rup?i-1:i+1; if(i<0||j<0||j>=draft.ids.length) return; [draft.ids[i],draft.ids[j]]=[draft.ids[j],draft.ids[i]]; return refreshRuta(); }
+    if(d.rdel){ draft.ids=draft.ids.filter(x=>x!==d.rdel); return refreshRuta(); }
+    if(b.hasAttribute("data-rsort")){ draft.ids=sortIds(draft.ids); refreshRuta(); return toast("Ordenada por cercanía"); }
+    if(b.hasAttribute("data-saveruta")){
+      draft.ids=draft.ids.filter(byId);
+      if(!draft.ids.length) return toast("Añade al menos un cliente a la ruta");
+      const r={id:draft.id||uuid(), nombre:(draft.nombre||"").trim()||"Ruta del "+fmtShort(draft.fecha||today()), fecha:draft.fecha||today(), ids:draft.ids, cr:draft.cr||new Date().toISOString()};
+      DB.rutas=DB.rutas||[]; const k=DB.rutas.findIndex(x=>x.id===r.id); if(k>=0) DB.rutas[k]=r; else DB.rutas.push(r);
+      DB.rutasDirty=true; save(); draft=null; tab="ruta"; stack=[{v:"zonas"},{v:"ruta",rid:r.id}]; ui={}; render(true); return toast("Ruta guardada");
+    }
+  }
   if(d.lista!==undefined){ const [z,p]=d.lista.split("|"); filt="all"; listQ=""; return go({v:"lista",z,p}); }
   if(b.hasAttribute("data-lclear")){ listQ=""; render(); $("lq").focus(); return; }
   if(d.filt){ filt=d.filt; return render(); }
