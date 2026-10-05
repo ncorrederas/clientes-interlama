@@ -665,11 +665,14 @@ let rap=null;
 const fmtYY = iso => { const [y,m,d]=iso.split("-"); return `${d}/${m}/${y.slice(2)}`; };
 const kmNum = v => { const n=parseInt(String(v??"").replace(/\D/g,""),10); return isNaN(n)?"":n; };
 const rapKm = r => kmNum(r.km ?? r.kmFin ?? r.kmIni ?? "");
+const rapKms = r => { const a=kmNum(r.kmIni??""), b=kmNum(r.kmFin??""); return (a!==""&&b!==""&&b>=a) ? b-a : ""; };
+const kmTotTxt = () => { const a=kmNum(rap.kmIni??""), b=kmNum(rap.kmFin??""); if(a===""||b==="") return ""; if(b<a) return "⚠️ Los de llegada son menos que los de salida. Revísalos."; return `Hoy has hecho <b>${(b-a).toLocaleString("es-ES")} km</b>`; };
+const kmTotUpd = () => { const t=$("rp-kmt"); if(t) t.innerHTML=kmTotTxt(); };
 const addLine = c => rap.lineas.push({cid:c.id, n:c.n, p:title(c.p), m:"Visita comercial"});
 V.rapport = () => {
   const rs=[...(DB.rapports||[])].sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.cr||"").localeCompare(a.cr||""));
   let h=`<button class="btn pri" data-newrap>${ICON.plus}Nuevo rapport</button>`;
-  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const k=rapKm(r), km=k!==""?` · ${k.toLocaleString("es-ES")} km`:"";
+  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const t=rapKms(r), k=rapKm(r), km=t!==""?` · ${t.toLocaleString("es-ES")} km hechos`:(k!==""?` · ${k.toLocaleString("es-ES")} km`:"");
     return `<button class="big sm" data-rap="${r.id}"><span><span class="bn">${esc(diaLabel(r.fecha))}</span><span class="bs">${fmtShort(r.fecha)}${km}</span></span><span class="bc">${r.lineas.length}</span></button>`; }).join("")+`</div>`;
   return {t:"Rapport", s:"Visitas del día para la empresa", h};
 };
@@ -682,7 +685,7 @@ function rapLinesHtml(){
     <span class="rctl"><button class="ib" data-lup="${i}" aria-label="Subir"${i?"":" disabled"}>${ICON.up}</button><button class="ib" data-ldown="${i}" aria-label="Bajar"${i<ls.length-1?"":" disabled"}>${ICON.down}</button><button class="ib x" data-ldel="${i}" aria-label="Quitar ${esc(l.n)}">${ICON.x}</button></span></li>`).join("")}</ol>`;
 }
 function quickAdds(){ const f=rap.fecha, have=new Set(selIds());
-  const vis=DB.clients.filter(c=>!have.has(c.id) && c.notes.some(n=>n.d===f && n.t==="Visita"));
+  const vis=DB.clients.filter(c=>!have.has(c.id) && (c.notes||[]).some(n=>n.d===f && n.t==="Visita"));
   const rts=(DB.rutas||[]).filter(r=>r.fecha===f).map(r=>({r, ids:r.ids.filter(id=>byId(id) && !have.has(id))})).filter(x=>x.ids.length);
   let h=""; if(vis.length) h+=`<button class="btn" data-qvis>${ICON.check}Añadir los ${vis.length} marcados «He estado hoy»</button>`;
   rts.forEach(x=>{ h+=`<button class="btn" data-qruta="${x.r.id}">${ICON.pin}Añadir los ${x.ids.length} de la ruta «${esc(x.r.nombre)}»</button>`; });
@@ -700,19 +703,18 @@ V.rapEd = () => {
   <div id="rsel" style="display:flex;flex-direction:column;gap:10px">${rapLinesHtml()}</div>
   <datalist id="motl">${MOTIVOS.map(m=>`<option value="${m}">`).join("")}</datalist>
   <h2 class="sec">Añadir clientes</h2>
-  <div id="rqa" style="display:flex;flex-direction:column;gap:10px">${quickAdds()}</div>
   ${raddHtml()}
   <h2 class="sec">Kilómetros</h2>
-  <section class="box"><label class="lbl">Kilómetros del coche<input type="text" inputmode="numeric" id="rp-km" value="${esc(rap.km)}" placeholder="Por ejemplo: 31290" autocomplete="off"></label></section>
+  <section class="box"><div style="display:flex;flex-direction:column;gap:16px"><label class="lbl">Kilómetros de salida<input type="text" inputmode="numeric" id="rp-kmi" value="${esc(rap.kmIni)}" placeholder="Por ejemplo: 31290" autocomplete="off"></label><label class="lbl">Kilómetros de llegada<input type="text" inputmode="numeric" id="rp-kmf" value="${esc(rap.kmFin)}" placeholder="Por ejemplo: 31420" autocomplete="off"></label><p class="hint" id="rp-kmt" style="font-size:1.1rem">${kmTotTxt()}</p></div></section>
   <div class="savebar"><button class="btn pri" data-rappdf>${ICON.doc}Guardar y descargar PDF</button></div>
   <button class="btn" data-rapsave>Guardar sin descargar</button>
   ${!rap.id?"":ui.delRap?`<div class="confirm"><strong>¿Borrar este rapport?</strong><div class="row2"><button class="btn" data-delrapno>Cancelar</button><button class="btn pri" data-delrapyes>Sí, borrar</button></div></div>`:`<button class="btn danger" data-delrap>${ICON.trash}Borrar rapport</button>`}`;
-  return {t:"Rapport · "+fmtShort(rap.fecha), s:"Clientes, motivo y kilómetros", h};
+  return {t:"Rapport · "+fmtShort(rap.fecha), s:"Clientes, motivo y kilómetros", h: h + `<div id="rqa" style="display:flex;flex-direction:column;gap:10px;margin-top:28px">${quickAdds()}</div>`};
 };
 function rapSave(){
   rap.lineas=rap.lineas.filter(l=>(l.n||"").trim()).map(l=>({...l, n:l.n.trim(), p:(l.p||"").trim(), m:(l.m||"").trim()}));
   if(!rap.lineas.length){ refreshRuta(); toast("Añade al menos un cliente"); return null; }
-  const r={id:rap.id||uuid(), fecha:rap.fecha||today(), km:kmNum(rap.km), lineas:rap.lineas, cr:rap.cr||new Date().toISOString()};
+  const r={id:rap.id||uuid(), fecha:rap.fecha||today(), kmIni:kmNum(rap.kmIni??""), kmFin:kmNum(rap.kmFin??""), lineas:rap.lineas, cr:rap.cr||new Date().toISOString()};
   DB.rapports=DB.rapports||[]; const k=DB.rapports.findIndex(x=>x.id===r.id); if(k>=0) DB.rapports[k]=r; else DB.rapports.push(r);
   markDirty("rapports"); save(); rap=JSON.parse(JSON.stringify(r)); return r;
 }
@@ -733,7 +735,7 @@ function rapPdf(r){
   txt(String(P.nombre).toUpperCase(), 100, top+6, 13);
   txt(fmtYY(r.fecha), R, top+15, 13, {align:"right"});
   txt("MATRICULA:", L, top+24, 10); txt(String(P.matricula), L+25, top+24, 10);
-  doc.setLineWidth(.3); doc.rect(100, top+18, R-100, 8); txt(`KILOMETROS  ${r.km===""||r.km==null?"":r.km}`, 102, top+24, 13);
+  doc.setLineWidth(.3); doc.rect(100, top+18, R-100, 8); const kmT=rapKms(r), kmTop = kmT!=="" ? kmT : (r.kmIni==null&&r.kmFin==null&&r.km!=null ? r.km : ""); txt(`KILOMETROS  ${kmTop}`, 102, top+24, 13);
   let y=top+32;
   const head=()=>{ doc.setLineWidth(.5); doc.rect(L,y,R-L,6); doc.line(X[1],y,X[1],y+6); doc.line(X[2],y,X[2],y+6);
     txt("CLIENTE",X[0]+1.5,y+4.3,8.5); txt("POBLACION",X[1]+1.5,y+4.3,8.5); txt("MOTIVO DE LA VISITA  / OBSERVACIONES",X[2]+1.5,y+4.3,8.5); y+=6; doc.setLineWidth(.3); };
@@ -741,14 +743,17 @@ function rapPdf(r){
   doc.setFontSize(11);
   const rows=r.lineas.map(l=>{ const a=doc.splitTextToSize(l.n||"",X[1]-X[0]-3), b=doc.splitTextToSize(l.p||"",X[2]-X[1]-3), c=doc.splitTextToSize(l.m||"",X[3]-X[2]-3);
     return {a,b,c,h:Math.max(11, Math.max(a.length,b.length,c.length)*4.6+6)}; });
-  const n=Math.max(rows.length,15);
+  let n=rows.length; { let yy=y; rows.forEach(r=>{ if(yy+r.h>bottom) yy=top+6; yy+=r.h; }); while(yy+11<=270){ n++; yy+=11; } }
   for(let i=0;i<n;i++){ const row=rows[i]||{a:[],b:[],c:[],h:11};
     if(y+row.h>bottom){ if(!rows[i]) break; doc.addPage(); y=top; head(); }
     doc.rect(L,y,R-L,row.h); doc.line(X[1],y,X[1],y+row.h); doc.line(X[2],y,X[2],y+row.h);
     doc.setFont("helvetica","normal"); doc.setFontSize(11);
     if(row.a.length) doc.text(row.a,X[0]+1.5,y+6.5); if(row.b.length) doc.text(row.b,X[1]+1.5,y+6.5); if(row.c.length) doc.text(row.c,X[2]+1.5,y+6.5);
     y+=row.h; }
-  return doc.output("arraybuffer");
+const kI=kmNum(r.kmIni??""), kF=kmNum(r.kmFin??"");
+if(kI!==""||kF!==""){ y+=6; if(y+10>287){ doc.addPage(); y=top; } doc.setLineWidth(.5); doc.rect(L,y,R-L,10); doc.line(75,y,75,y+10); doc.line(135,y,135,y+10);
+txt(`KM SALIDA  ${kI}`, L+2, y+6.8, 11); txt(`KM LLEGADA  ${kF}`, 77, y+6.8, 11); txt(`KM HECHOS  ${kmT}`, 137, y+6.8, 11); }
+return doc.output("arraybuffer");
 }
 async function rapDownload(){
   const r=rapSave(); if(!r) return;
@@ -991,7 +996,7 @@ function render(reset){
     const q=$("rq"); if(q) q.oninput=e=>{ rq=e.target.value; $("rres").innerHTML=rresHtml(); }; }
   if(view.v==="rapEd" && rap){
     $("rp-f").onchange=e=>{ rap.fecha=e.target.value||today(); render(); };
-    $("rp-km").oninput=e=>{ rap.km=e.target.value; };
+    $("rp-kmi").oninput=e=>{ rap.kmIni=e.target.value; kmTotUpd(); }; $("rp-kmf").oninput=e=>{ rap.kmFin=e.target.value; kmTotUpd(); };
     const q=$("rq"); if(q) q.oninput=e=>{ rq=e.target.value; $("rres").innerHTML=rresHtml(); }; }
   if(view.v==="ajustes"){ $("start").onchange=e=>{ DB.start=e.target.value; save(); toast("Salida: "+title(DB.start)); }; }
   if(view.v==="form"){ const p=$("f-p"); p.oninput=()=>{ const z=PZ[p.value.trim().toUpperCase()]; if(z) $("f-z").value=z; }; }
@@ -1011,8 +1016,8 @@ $("v").onclick=async e=>{
   if(b.hasAttribute("data-delruta")){ ui.delRuta=true; return render(); }
   if(b.hasAttribute("data-delrutano")){ ui.delRuta=false; return render(); }
   if(b.hasAttribute("data-delrutayes")){ DB.rutas=DB.rutas.filter(r=>r.id!==view.rid); markDirty("rutas"); save(); stack=[{v:"zonas"}]; ui={}; render(true); return toast("Ruta borrada"); }
-  if(b.hasAttribute("data-newrap")){ const f=today(); rap={id:null, fecha:f, km:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
-  if(d.rap){ const r=(DB.rapports||[]).find(x=>x.id===d.rap); if(!r) return; rap=JSON.parse(JSON.stringify(r)); rap.km=rapKm(r); rq=""; return go({v:"rapEd"}); }
+  if(b.hasAttribute("data-newrap")){ const f=today(); const last=(DB.rapports||[]).slice().sort((x,y)=>(y.fecha||"").localeCompare(x.fecha||"")||(y.cr||"").localeCompare(x.cr||""))[0]; rap={id:null, fecha:f, kmIni:last?rapKm(last):"", kmFin:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
+  if(d.rap){ const r=(DB.rapports||[]).find(x=>x.id===d.rap); if(!r) return; rap=JSON.parse(JSON.stringify(r)); rap.kmIni=r.kmIni!=null?String(r.kmIni):""; rap.kmFin=r.kmFin!=null?String(r.kmFin):(r.kmIni==null&&r.km!=null?String(r.km):""); delete rap.km; rq=""; return go({v:"rapEd"}); }
   if(rap && view.v==="rapEd"){
     if(d.rmode){ rmode=d.rmode; return render(); }
     if(d.rz){ rzona = rzona===d.rz ? "" : d.rz; rpueblo=""; return render(); }
@@ -1054,8 +1059,8 @@ $("v").onclick=async e=>{
   if(d.filt){ filt=d.filt; return render(); }
   if(d.open) return go({v:"ficha",id:d.open});
   if(d.copy!==undefined){ try{ await navigator.clipboard.writeText(d.copy); toast("Copiado"); }catch(err){ toast("Mantén el dedo encima para copiar"); } return; }
-  if(d.st && c){ c.st=d.st; save(); render(); return toast("Estado: "+EST[d.st]); }
-  if(b.hasAttribute("data-visit") && c){ c.notes.push(newNote("Visita","",false)); if(c.st==="pend") c.st="vis"; save(); render(); return toast("Visita de hoy apuntada"); }
+  if(d.st && c){ c.st=d.st; if(d.st==="vis" && !(c.notes||[]).some(n=>n.d===today()&&n.t==="Visita")){ c.notes=c.notes||[]; c.notes.push(newNote("Visita","",false)); } save(); render(); return toast("Estado: "+EST[d.st]); }
+  if(b.hasAttribute("data-visit") && c){ c.notes=c.notes||[]; if(c.notes.some(n=>n.d===today()&&n.t==="Visita")){ if(c.st==="pend") c.st="vis"; save(); render(); return toast("Ya estaba apuntado que has estado hoy"); } c.notes.push(newNote("Visita","",false)); if(c.st==="pend") c.st="vis"; save(); render(); return toast("Visita de hoy apuntada"); }
   if(d.addnote){ sheet={type:"note", id:d.addnote, when:"7", txt:""}; return renderSheet(); }
   if(d.editnote){ const [cid,nid]=d.editnote.split("|"), x=byId(cid), n=x&&x.notes.find(y=>y.id===nid); if(!n) return;
     sheet={type:"note", id:cid, nid, txt:n.t, when:n.av?"x":"no", date:n.av||""}; return renderSheet(); }
