@@ -149,11 +149,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand)}
 .confirm{background:var(--orange-bg);color:var(--fg);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .empty{color:var(--muted);text-align:center;padding:30px 10px}
 
-.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tab{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 10px;font-weight:700;font-size:.85rem;color:var(--muted);position:relative;min-height:62px;justify-content:center}
-.tab svg{width:28px;height:28px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--surface);border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tab{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 1px 10px;font-weight:700;font-size:.78rem;color:var(--muted);position:relative;min-height:62px;justify-content:center}
+.tab svg{width:26px;height:26px}
 .tab[aria-current="true"]{color:var(--brand)}
-.tab.new .plus{width:44px;height:44px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center}
+.tab.new .plus{width:40px;height:40px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center}
 .tab.new .plus svg{width:28px;height:28px}
 .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:24px;height:24px;border-radius:12px;background:var(--orange);color:#1d1716;font-size:.85rem;display:flex;align-items:center;justify-content:center;padding:0 6px}
 .badge[hidden],.toast[hidden]{display:none}
@@ -236,6 +236,10 @@ body.nohead main{padding-top:calc(16px + env(safe-area-inset-top,0px))}
 .addb[aria-pressed="true"]{background:var(--s-ped-bg);color:var(--s-ped);border-color:var(--s-ped)}
 .rstop{font-weight:700;color:var(--muted);font-size:.95rem;margin:6px 0 -6px;display:flex;align-items:center;gap:4px}
 .savebar{position:sticky;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;flex-direction:column;gap:8px;padding:10px 0 0;background:linear-gradient(to bottom,transparent,var(--bg) 30%)}
+.rapl{flex-wrap:wrap;align-items:flex-start}
+.rapl .rn{flex:1 1 calc(100% - 50px);gap:6px}
+.rapl .rctl{width:100%;justify-content:flex-end}
+input.rin{min-height:48px;padding:8px 12px;font-size:1rem}
 .pills .pill[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 
 /* pantalla de entrada: solo fondo rojo y los campos */
@@ -266,6 +270,7 @@ body.login main{min-height:100vh;min-height:100dvh;justify-content:center;paddin
   <button class="tab" data-tab="avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Avisos<span class="badge" id="badge" hidden></span></button>
   <button class="tab" data-tab="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar</button>
   <button class="tab" data-tab="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M10.3 3h3.4l.5 2.5 1.8.8 2.2-1.4 2.4 2.4-1.4 2.2.8 1.8 2.5.5v3.4l-2.5.5-.8 1.8 1.4 2.2-2.4 2.4-2.2-1.4-1.8.8-.5 2.5h-3.4l-.5-2.5-1.8-.8-2.2 1.4-2.4-2.4 1.4-2.2-.8-1.8L1.5 13.7v-3.4l2.5-.5.8-1.8-1.4-2.2 2.4-2.4 2.2 1.4 1.8-.8z"/><circle cx="12" cy="12" r="3.2"/></svg>Ajustes</button>
+  <button class="tab" data-tab="rapport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10.5h7M8.5 14h7M8.5 17.5h4"/></svg>Rapport</button>
   <button class="tab new" data-tab="nuevo"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Nuevo</button>
 </nav>
 <div id="sheet"></div>
@@ -322,7 +327,7 @@ const SB_KEY = "sb_publishable_48ZUCL9AdmJlgEyTgZ9ZtA_GKrpKLuU";
 const CACHE = "interlama-crm-cloud-v1";
 const hex12 = n => n.toString(16).padStart(12,"0");
 const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx".replace(/x/g,()=>(Math.random()*16|0).toString(16)));
-let DB={clients:[], lastExport:"", start:"PINEDA DE MAR", rutas:[]}, canStore=true;
+let DB={clients:[], lastExport:"", start:"PINEDA DE MAR", rutas:[], rapports:[]}, canStore=true;
 let SYNCED={clients:{}, notes:{}, orders:{}, start:null};
 let sb=null, session=null, READY=false, syncState="ok", syncTimer=null, retryTimer=null;
 
@@ -330,19 +335,24 @@ function cacheLocal(){ try{ localStorage.setItem(CACHE, JSON.stringify({DB, SYNC
 function loadCache(uid){
   try{ const raw=localStorage.getItem(CACHE); if(!raw) return false; const o=JSON.parse(raw);
     if(!o || !o.DB || !Array.isArray(o.DB.clients) || (uid && o.who && o.who!==uid)) return false;
-    DB=o.DB; SYNCED=o.SYNCED||{clients:{},notes:{},start:null}; SYNCED.orders=SYNCED.orders||{}; DB.clients.forEach(c=>{ c.ord=c.ord||[]; }); DB.rutas=DB.rutas||[]; if(!GEO[DB.start]) DB.start="PINEDA DE MAR"; return true;
+    DB=o.DB; SYNCED=o.SYNCED||{clients:{},notes:{},start:null}; SYNCED.orders=SYNCED.orders||{}; DB.clients.forEach(c=>{ c.ord=c.ord||[]; }); DB.rutas=DB.rutas||[]; DB.rapports=DB.rapports||[]; if(!GEO[DB.start]) DB.start="PINEDA DE MAR"; return true;
   }catch(e){ return false; }
 }
 function save(){ cacheLocal(); clearTimeout(syncTimer); syncTimer=setTimeout(()=>{ flush(); pushRutas(); }, 300); }
 /* las rutas se guardan en la tabla «ajustes» (clave «rutas»), así se ven en todos los aparatos */
-let rutasBusy=false;
+const JK=["rutas","rapports","perfil"];
+const markDirty = k => { DB.dirty=DB.dirty||{}; DB.dirty[k]=true; };
+let jsonBusy=false;
 async function pushRutas(){
-  if(!sb || !session || !DB.rutasDirty || rutasBusy) return; rutasBusy=true;
-  const v=JSON.stringify(DB.rutas||[]);
-  try{ const {error}=await sb.from("ajustes").upsert({clave:"rutas", valor:v}); if(error) throw error;
-    SYNCED.rutas=v; if(JSON.stringify(DB.rutas||[])===v) DB.rutasDirty=false; cacheLocal(); }
-  catch(err){ console.warn("rutas", err); }
-  finally{ rutasBusy=false; }
+  if(!sb || !session || jsonBusy) return;
+  DB.dirty=DB.dirty||{}; if(DB.rutasDirty){ DB.dirty.rutas=true; delete DB.rutasDirty; }
+  const ks=JK.filter(k=>DB.dirty[k]); if(!ks.length) return; jsonBusy=true;
+  try{ for(const k of ks){ const v=JSON.stringify(DB[k]??null);
+      const {error}=await sb.from("ajustes").upsert({clave:k, valor:v}); if(error) throw error;
+      SYNCED[k]=v; if(JSON.stringify(DB[k]??null)===v) DB.dirty[k]=false; }
+    cacheLocal(); }
+  catch(err){ console.warn("ajustes", err); }
+  finally{ jsonBusy=false; }
 }
 
 const rowOf = c => ({id:c.id, codigo:c.c||"", nombre:c.n, contacto:c.r||"", telefono:c.t||"", email:c.e||"", pueblo:c.p||"",
@@ -421,10 +431,10 @@ async function pull(){
   DB.clients=cs.map(r=>({id:r.id, c:r.codigo, n:r.nombre, r:r.contacto, t:r.telefono, e:r.email, p:r.pueblo, z:r.zona, st:r.estado, rec:r.volver_llamar||"", notes:byC[r.id]||[], ord:byO[r.id]||[]}));
   const sal=as.find(a=>a.clave==="salida"); DB.start = sal && GEO[sal.valor] ? sal.valor : (DB.start||"PINEDA DE MAR");
   SYNCED={clients:{}, notes:{}, orders:{}, start: sal?sal.valor:null};
-  const ru=as.find(a=>a.clave==="rutas");
-  if(ru){ SYNCED.rutas = typeof ru.valor==="string" ? ru.valor : JSON.stringify(ru.valor);
-    if(!DB.rutasDirty){ try{ const v=typeof ru.valor==="string"?JSON.parse(ru.valor):ru.valor; if(Array.isArray(v)) DB.rutas=v; }catch(e){} } }
-  DB.rutas=DB.rutas||[]; if(DB.rutasDirty) pushRutas();
+  DB.dirty=DB.dirty||{}; if(DB.rutasDirty){ DB.dirty.rutas=true; delete DB.rutasDirty; }
+  JK.forEach(k=>{ const ru=as.find(a=>a.clave===k); if(!ru) return; SYNCED[k]=typeof ru.valor==="string"?ru.valor:JSON.stringify(ru.valor);
+    if(!DB.dirty[k]){ try{ const v=typeof ru.valor==="string"?JSON.parse(ru.valor):ru.valor; if(v!=null) DB[k]=v; }catch(e){} } });
+  DB.rutas=DB.rutas||[]; DB.rapports=DB.rapports||[]; if(JK.some(k=>DB.dirty[k])) pushRutas();
   DB.clients.forEach(c=>{ SYNCED.clients[c.id]=JSON.stringify(rowOf(c)); c.notes.forEach(n=>SYNCED.notes[n.id]=JSON.stringify(noteRow(c,n))); c.ord.forEach(o=>SYNCED.orders[o.id]=JSON.stringify(ordRow(c,o))); });
   /* los antiguos «Volver a llamar» pasan a ser notas con aviso */
   let moved=0; DB.clients.forEach(c=>{ if(c.rec){ c.notes.push(newNote("Volver a llamar", c.rec)); c.rec=""; moved++; } });
@@ -436,7 +446,7 @@ async function pull(){
 
 function logoutLocal(){
   try{ localStorage.removeItem(CACHE); }catch(e){}
-  session=null; READY=false; DB={clients:[], lastExport:"", start:"PINEDA DE MAR", rutas:[]}; SYNCED={clients:{},notes:{},orders:{},start:null}; sheet=null; micKill();
+  session=null; READY=false; DB={clients:[], lastExport:"", start:"PINEDA DE MAR", rutas:[], rapports:[]}; SYNCED={clients:{},notes:{},orders:{},start:null}; sheet=null; micKill();
   tab="ruta"; stack=[{v:"zonas"}]; ui={}; render(true);
 }
 
@@ -477,7 +487,7 @@ let sheet=null;
 function go(view){ micKill(); sheet=null; stack.push(view); ui={}; render(true); }
 function back(){ micKill(); sheet=null; if(stack.length>1){ stack.pop(); ui={}; render(true); } }
 function setTab(t){ micKill(); sheet=null; tab=t; ui={};
-  stack = t==="ruta"?[{v:"zonas"}] : t==="avisos"?[{v:"avisos"}] : t==="buscar"?[{v:"buscar"}] : t==="ajustes"?[{v:"ajustes"}] : [{v:"form",id:null}];
+  stack = t==="ruta"?[{v:"zonas"}] : t==="avisos"?[{v:"avisos"}] : t==="buscar"?[{v:"buscar"}] : t==="ajustes"?[{v:"ajustes"}] : t==="rapport"?[{v:"rapport"}] : [{v:"form",id:null}];
   render(true); }
 
 /* ---------- piezas ---------- */
@@ -603,19 +613,21 @@ function rselHtml(){
       <button class="ib" data-rdown="${c.id}" aria-label="Bajar ${esc(c.n)}"${i<cs.length-1?"":" disabled"}>${ICON.down}</button>
       <button class="ib x" data-rdel="${c.id}" aria-label="Quitar ${esc(c.n)} de la ruta">${ICON.x}</button></span></li>`).join("")}</ol>`;
 }
-function rrow(c){ const on=draft.ids.includes(c.id);
-  return `<li class="rrow"><span class="rn"><b>${esc(c.n)}</b><small>${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""} · ${EST[c.st]}</small></span><button class="addb" data-rtog="${c.id}" aria-pressed="${on}">${on?"✓ En la ruta":"+ Añadir"}</button></li>`; }
+const selIds = () => cur().v==="rapEd" && rap ? rap.lineas.map(l=>l.cid).filter(Boolean) : (draft ? draft.ids : []);
+function rrow(c){ const on=selIds().includes(c.id);
+  return `<li class="rrow"><span class="rn"><b>${esc(c.n)}</b><small>${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""} · ${EST[c.st]}</small></span><button class="addb" data-rtog="${c.id}" aria-pressed="${on}">${on?(cur().v==="rapEd"?"✓ Añadido":"✓ En la ruta"):"+ Añadir"}</button></li>`; }
 function rresHtml(){
   if(rmode==="buscar"){
     const q=norm(rq.trim()), qd=q.replace(/\D/g,"");
     if(q.length<2) return `<p class="hint">Escribe al menos 2 letras del nombre, el pueblo o el teléfono.</p>`;
     const r=DB.clients.filter(c=>norm(c.n+" "+c.r+" "+c.p+" "+c.c).includes(q) || (qd.length>=3 && String(c.t||"").replace(/\D/g,"").includes(qd))).sort(sortN);
-    if(!r.length) return `<p class="empty">Ningún cliente coincide con «${esc(rq.trim())}».</p>`;
-    return (r.length>40?`<p class="hint">Mostrando 40 de ${r.length}. Escribe algo más concreto.</p>`:"")+`<ul class="rlist">${r.slice(0,40).map(rrow).join("")}</ul>`;
+    const free = cur().v==="rapEd" ? `<button class="btn" data-rfree>${ICON.plus}Añadir «${esc(rq.trim())}» (no está en la app)</button>` : "";
+    if(!r.length) return `<p class="empty">Ningún cliente coincide con «${esc(rq.trim())}».</p>`+free;
+    return (r.length>40?`<p class="hint">Mostrando 40 de ${r.length}. Escribe algo más concreto.</p>`:"")+`<ul class="rlist">${r.slice(0,40).map(rrow).join("")}</ul>`+free;
   }
   if(!rzona) return `<p class="hint">Elige una zona.</p>`;
   if(!rpueblo) return `<p class="hint">Elige un pueblo.</p>`;
-  const r=DB.clients.filter(c=>c.z===rzona && c.p===rpueblo).sort(sortN), left=r.filter(c=>!draft.ids.includes(c.id)).length;
+  const r=DB.clients.filter(c=>c.z===rzona && c.p===rpueblo).sort(sortN), left=r.filter(c=>!selIds().includes(c.id)).length;
   return (left?`<button class="btn" data-rall>${ICON.plus}Añadir los ${left} que faltan de ${esc(title(rpueblo))}</button>`:"")+`<ul class="rlist">${r.map(rrow).join("")}</ul>`;
 }
 function raddHtml(){
@@ -641,7 +653,111 @@ V.rutaEd = () => {
   <div class="savebar"><button class="btn pri" data-saveruta>${ICON.check}Guardar ruta</button></div>`;
   return {t:draft.id?"Editar ruta":"Nueva ruta", s:"Elige los clientes y el orden", h};
 };
-function refreshRuta(){ const a=$("rsel"); if(a) a.innerHTML=rselHtml(); const n=$("rcount"); if(n) n.textContent=draft.ids.length; const r=$("rres"); if(r) r.innerHTML=rresHtml(); }
+function refreshRuta(){ const ed=cur().v==="rapEd" && rap;
+  const a=$("rsel"); if(a) a.innerHTML=ed?rapLinesHtml():rselHtml(); const n=$("rcount"); if(n) n.textContent=ed?rap.lineas.length:draft.ids.length;
+  const r=$("rres"); if(r) r.innerHTML=rresHtml(); const q=$("rqa"); if(q && ed) q.innerHTML=quickAdds(); }
+
+/* ---------- rapport de visitas (hoja que pide la empresa) ---------- */
+const PERFIL0={nombre:"FERNANDO CORREDERAS HERMÁN", matricula:"3837 NHV"};
+const perfil = () => Object.assign({}, PERFIL0, DB.perfil||{});
+const MOTIVOS=["Visita comercial","Cobro","Revisión","Visita de cortesía","Entrega de material","Presupuesto"];
+let rap=null;
+const fmtYY = iso => { const [y,m,d]=iso.split("-"); return `${d}/${m}/${y.slice(2)}`; };
+const kmNum = v => { const n=parseInt(String(v??"").replace(/\D/g,""),10); return isNaN(n)?"":n; };
+const rapKm = r => kmNum(r.km ?? r.kmFin ?? r.kmIni ?? "");
+const addLine = c => rap.lineas.push({cid:c.id, n:c.n, p:title(c.p), m:"Visita comercial"});
+V.rapport = () => {
+  const rs=[...(DB.rapports||[])].sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.cr||"").localeCompare(a.cr||""));
+  let h=`<button class="btn pri" data-newrap>${ICON.plus}Nuevo rapport</button>`;
+  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const k=rapKm(r), km=k!==""?` · ${k.toLocaleString("es-ES")} km`:"";
+    return `<button class="big sm" data-rap="${r.id}"><span><span class="bn">${esc(diaLabel(r.fecha))}</span><span class="bs">${fmtShort(r.fecha)}${km}</span></span><span class="bc">${r.lineas.length}</span></button>`; }).join("")+`</div>`;
+  return {t:"Rapport", s:"Visitas del día para la empresa", h};
+};
+function rapLinesHtml(){
+  const ls=rap.lineas;
+  if(!ls.length) return `<p class="hint">Añade abajo los clientes que has visitado.</p>`;
+  return `<ol class="rlist">${ls.map((l,i)=>`<li class="rrow rapl"><span class="stop">${i+1}</span><span class="rn">
+    ${l.cid?`<b>${esc(l.n)}</b><small>${esc(l.p)}</small>`:`<input type="text" class="rin" data-lf="n" data-li="${i}" value="${esc(l.n)}" placeholder="Cliente" aria-label="Cliente"><input type="text" class="rin" data-lf="p" data-li="${i}" value="${esc(l.p)}" placeholder="Población" aria-label="Población">`}
+    <input type="text" class="rin" list="motl" data-lf="m" data-li="${i}" value="${esc(l.m)}" placeholder="Motivo de la visita / observaciones" aria-label="Motivo de la visita de ${esc(l.n)}"></span>
+    <span class="rctl"><button class="ib" data-lup="${i}" aria-label="Subir"${i?"":" disabled"}>${ICON.up}</button><button class="ib" data-ldown="${i}" aria-label="Bajar"${i<ls.length-1?"":" disabled"}>${ICON.down}</button><button class="ib x" data-ldel="${i}" aria-label="Quitar ${esc(l.n)}">${ICON.x}</button></span></li>`).join("")}</ol>`;
+}
+function quickAdds(){ const f=rap.fecha, have=new Set(selIds());
+  const vis=DB.clients.filter(c=>!have.has(c.id) && c.notes.some(n=>n.d===f && n.t==="Visita"));
+  const rts=(DB.rutas||[]).filter(r=>r.fecha===f).map(r=>({r, ids:r.ids.filter(id=>byId(id) && !have.has(id))})).filter(x=>x.ids.length);
+  let h=""; if(vis.length) h+=`<button class="btn" data-qvis>${ICON.check}Añadir los ${vis.length} marcados «He estado hoy»</button>`;
+  rts.forEach(x=>{ h+=`<button class="btn" data-qruta="${x.r.id}">${ICON.pin}Añadir los ${x.ids.length} de la ruta «${esc(x.r.nombre)}»</button>`; });
+  return h;
+}
+V.rapEd = () => {
+  if(!rap) return {t:"Rapport", s:"", h:`<p class="empty">No hay ningún rapport abierto.</p>`};
+  const P=perfil();
+  const h=`<section class="box">
+    <label class="lbl">Día<input type="date" id="rp-f" value="${esc(rap.fecha)}"></label>
+    ${ui.perfil?`<label class="lbl">Nombre en el rapport<input type="text" id="pf-n" value="${esc(P.nombre)}" autocomplete="off"></label><label class="lbl">Matrícula<input type="text" id="pf-m" value="${esc(P.matricula)}" autocomplete="off"></label><button class="btn" data-perfilok>Guardar nombre y matrícula</button>`
+      :`<p class="hint" style="font-size:.95rem">${esc(P.nombre)} · Matrícula ${esc(P.matricula)} · <button class="nedit" data-perfil>Cambiar</button></p>`}
+  </section>
+  <h2 class="sec">Clientes visitados · <span id="rcount">${rap.lineas.length}</span></h2>
+  <div id="rsel" style="display:flex;flex-direction:column;gap:10px">${rapLinesHtml()}</div>
+  <datalist id="motl">${MOTIVOS.map(m=>`<option value="${m}">`).join("")}</datalist>
+  <h2 class="sec">Añadir clientes</h2>
+  <div id="rqa" style="display:flex;flex-direction:column;gap:10px">${quickAdds()}</div>
+  ${raddHtml()}
+  <h2 class="sec">Kilómetros</h2>
+  <section class="box"><label class="lbl">Kilómetros del coche<input type="text" inputmode="numeric" id="rp-km" value="${esc(rap.km)}" placeholder="Por ejemplo: 31290" autocomplete="off"></label></section>
+  <div class="savebar"><button class="btn pri" data-rappdf>${ICON.doc}Guardar y descargar PDF</button></div>
+  <button class="btn" data-rapsave>Guardar sin descargar</button>
+  ${!rap.id?"":ui.delRap?`<div class="confirm"><strong>¿Borrar este rapport?</strong><div class="row2"><button class="btn" data-delrapno>Cancelar</button><button class="btn pri" data-delrapyes>Sí, borrar</button></div></div>`:`<button class="btn danger" data-delrap>${ICON.trash}Borrar rapport</button>`}`;
+  return {t:"Rapport · "+fmtShort(rap.fecha), s:"Clientes, motivo y kilómetros", h};
+};
+function rapSave(){
+  rap.lineas=rap.lineas.filter(l=>(l.n||"").trim()).map(l=>({...l, n:l.n.trim(), p:(l.p||"").trim(), m:(l.m||"").trim()}));
+  if(!rap.lineas.length){ refreshRuta(); toast("Añade al menos un cliente"); return null; }
+  const r={id:rap.id||uuid(), fecha:rap.fecha||today(), km:kmNum(rap.km), lineas:rap.lineas, cr:rap.cr||new Date().toISOString()};
+  DB.rapports=DB.rapports||[]; const k=DB.rapports.findIndex(x=>x.id===r.id); if(k>=0) DB.rapports[k]=r; else DB.rapports.push(r);
+  markDirty("rapports"); save(); rap=JSON.parse(JSON.stringify(r)); return r;
+}
+let pdfP=null;
+function loadPDF(){
+  if(window.jspdf) return Promise.resolve();
+  if(!pdfP) pdfP=new Promise((res,rej)=>{ const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload=res; s.onerror=()=>{pdfP=null;rej();}; document.head.appendChild(s); });
+  return pdfP;
+}
+/* hoja A4 igual que la plantilla de la empresa */
+function rapPdf(r){
+  const doc=new window.jspdf.jsPDF({unit:"mm",format:"a4"}), P=perfil();
+  const L=15, R=195, X=[15,67,100,195], top=18, bottom=278;
+  const txt=(t,x,y,size,o)=>{ doc.setFont("helvetica","normal"); doc.setFontSize(size); doc.text(t,x,y,o); };
+  txt("RAPPORT visitas", L, top+6, 20);
+  txt(String(P.nombre).toUpperCase(), 100, top+6, 13);
+  txt(fmtYY(r.fecha), R, top+15, 13, {align:"right"});
+  txt("MATRICULA:", L, top+24, 10); txt(String(P.matricula), L+25, top+24, 10);
+  doc.setLineWidth(.3); doc.rect(100, top+18, R-100, 8); txt(`KILOMETROS  ${r.km===""||r.km==null?"":r.km}`, 102, top+24, 13);
+  let y=top+32;
+  const head=()=>{ doc.setLineWidth(.5); doc.rect(L,y,R-L,6); doc.line(X[1],y,X[1],y+6); doc.line(X[2],y,X[2],y+6);
+    txt("CLIENTE",X[0]+1.5,y+4.3,8.5); txt("POBLACION",X[1]+1.5,y+4.3,8.5); txt("MOTIVO DE LA VISITA  / OBSERVACIONES",X[2]+1.5,y+4.3,8.5); y+=6; doc.setLineWidth(.3); };
+  head();
+  doc.setFontSize(11);
+  const rows=r.lineas.map(l=>{ const a=doc.splitTextToSize(l.n||"",X[1]-X[0]-3), b=doc.splitTextToSize(l.p||"",X[2]-X[1]-3), c=doc.splitTextToSize(l.m||"",X[3]-X[2]-3);
+    return {a,b,c,h:Math.max(11, Math.max(a.length,b.length,c.length)*4.6+6)}; });
+  const n=Math.max(rows.length,15);
+  for(let i=0;i<n;i++){ const row=rows[i]||{a:[],b:[],c:[],h:11};
+    if(y+row.h>bottom){ if(!rows[i]) break; doc.addPage(); y=top; head(); }
+    doc.rect(L,y,R-L,row.h); doc.line(X[1],y,X[1],y+row.h); doc.line(X[2],y,X[2],y+row.h);
+    doc.setFont("helvetica","normal"); doc.setFontSize(11);
+    if(row.a.length) doc.text(row.a,X[0]+1.5,y+6.5); if(row.b.length) doc.text(row.b,X[1]+1.5,y+6.5); if(row.c.length) doc.text(row.c,X[2]+1.5,y+6.5);
+    y+=row.h; }
+  return doc.output("arraybuffer");
+}
+async function rapDownload(){
+  const r=rapSave(); if(!r) return;
+  render(); toast("Preparando el PDF…");
+  try{ await loadPDF(); }catch(e){ return toast("Sin conexión: no se ha podido preparar el PDF. El rapport está guardado."); }
+  const [y,m,d]=r.fecha.split("-");
+  try{ await saveFile(`Rapport ${d}-${m}-${y}.pdf`, new Uint8Array(rapPdf(r))); toast("PDF descargado"); }
+  catch(err){ toast(err&&(err.code==="declined"||err.name==="AbortError")?"Descarga cancelada":"No se pudo descargar el PDF"); }
+}
 
 V.avisos = () => {
   const t=today(), all=[];
@@ -873,6 +989,10 @@ function render(reset){
   if(view.v==="rutaEd" && draft){
     $("r-n").oninput=e=>{ draft.nombre=e.target.value; }; $("r-f").onchange=e=>{ draft.fecha=e.target.value; };
     const q=$("rq"); if(q) q.oninput=e=>{ rq=e.target.value; $("rres").innerHTML=rresHtml(); }; }
+  if(view.v==="rapEd" && rap){
+    $("rp-f").onchange=e=>{ rap.fecha=e.target.value||today(); render(); };
+    $("rp-km").oninput=e=>{ rap.km=e.target.value; };
+    const q=$("rq"); if(q) q.oninput=e=>{ rq=e.target.value; $("rres").innerHTML=rresHtml(); }; }
   if(view.v==="ajustes"){ $("start").onchange=e=>{ DB.start=e.target.value; save(); toast("Salida: "+title(DB.start)); }; }
   if(view.v==="form"){ const p=$("f-p"); p.oninput=()=>{ const z=PZ[p.value.trim().toUpperCase()]; if(z) $("f-z").value=z; }; }
 }
@@ -890,7 +1010,28 @@ $("v").onclick=async e=>{
   if(d.editruta){ const r=rutaById(d.editruta); if(!r) return; draft=JSON.parse(JSON.stringify(r)); rq=""; return go({v:"rutaEd"}); }
   if(b.hasAttribute("data-delruta")){ ui.delRuta=true; return render(); }
   if(b.hasAttribute("data-delrutano")){ ui.delRuta=false; return render(); }
-  if(b.hasAttribute("data-delrutayes")){ DB.rutas=DB.rutas.filter(r=>r.id!==view.rid); DB.rutasDirty=true; save(); stack=[{v:"zonas"}]; ui={}; render(true); return toast("Ruta borrada"); }
+  if(b.hasAttribute("data-delrutayes")){ DB.rutas=DB.rutas.filter(r=>r.id!==view.rid); markDirty("rutas"); save(); stack=[{v:"zonas"}]; ui={}; render(true); return toast("Ruta borrada"); }
+  if(b.hasAttribute("data-newrap")){ const f=today(); rap={id:null, fecha:f, km:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
+  if(d.rap){ const r=(DB.rapports||[]).find(x=>x.id===d.rap); if(!r) return; rap=JSON.parse(JSON.stringify(r)); rap.km=rapKm(r); rq=""; return go({v:"rapEd"}); }
+  if(rap && view.v==="rapEd"){
+    if(d.rmode){ rmode=d.rmode; return render(); }
+    if(d.rz){ rzona = rzona===d.rz ? "" : d.rz; rpueblo=""; return render(); }
+    if(d.rp){ rpueblo = rpueblo===d.rp ? "" : d.rp; return render(); }
+    if(d.rtog){ const i=rap.lineas.findIndex(l=>l.cid===d.rtog), c=byId(d.rtog); if(i>=0) rap.lineas.splice(i,1); else if(c) addLine(c); refreshRuta(); return toast(i>=0?"Quitado del rapport":"Añadido al rapport"); }
+    if(b.hasAttribute("data-rall")){ const have=selIds(), add=DB.clients.filter(c=>c.z===rzona && c.p===rpueblo && !have.includes(c.id)).sort(sortN); add.forEach(addLine); refreshRuta(); return toast(add.length+" añadidos al rapport"); }
+    if(b.hasAttribute("data-rfree")){ const t=rq.trim(); if(!t) return; rap.lineas.push({cid:null, n:t, p:"", m:"Visita comercial"}); rq=""; render(); return toast("Añadido. Escribe la población"); }
+    if(b.hasAttribute("data-qvis")){ const have=selIds(); DB.clients.filter(c=>!have.includes(c.id) && c.notes.some(n=>n.d===rap.fecha && n.t==="Visita")).forEach(addLine); refreshRuta(); return toast("Añadidos"); }
+    if(d.qruta){ const r=rutaById(d.qruta); if(!r) return; const have=selIds(); r.ids.map(byId).filter(c=>c && !have.includes(c.id)).forEach(addLine); refreshRuta(); return toast("Añadidos los de la ruta"); }
+    if(d.lup||d.ldown){ const i=+(d.lup||d.ldown), j=d.lup?i-1:i+1; if(j<0||j>=rap.lineas.length) return; [rap.lineas[i],rap.lineas[j]]=[rap.lineas[j],rap.lineas[i]]; return refreshRuta(); }
+    if(d.ldel){ rap.lineas.splice(+d.ldel,1); return refreshRuta(); }
+    if(b.hasAttribute("data-perfil")){ ui.perfil=true; return render(); }
+    if(b.hasAttribute("data-perfilok")){ DB.perfil={nombre:$("pf-n").value.trim()||PERFIL0.nombre, matricula:$("pf-m").value.trim()}; markDirty("perfil"); save(); ui.perfil=false; render(); return toast("Guardado"); }
+    if(b.hasAttribute("data-rapsave")){ if(rapSave()){ render(); toast("Rapport guardado"); } return; }
+    if(b.hasAttribute("data-rappdf")) return rapDownload();
+    if(b.hasAttribute("data-delrap")){ ui.delRap=true; return render(); }
+    if(b.hasAttribute("data-delrapno")){ ui.delRap=false; return render(); }
+    if(b.hasAttribute("data-delrapyes")){ DB.rapports=(DB.rapports||[]).filter(r=>r.id!==rap.id); markDirty("rapports"); save(); rap=null; tab="rapport"; stack=[{v:"rapport"}]; ui={}; render(true); return toast("Rapport borrado"); }
+  }
   if(draft && view.v==="rutaEd"){
     if(d.rmode){ rmode=d.rmode; return render(); }
     if(d.rz){ rzona = rzona===d.rz ? "" : d.rz; rpueblo=""; return render(); }
@@ -905,7 +1046,7 @@ $("v").onclick=async e=>{
       if(!draft.ids.length) return toast("Añade al menos un cliente a la ruta");
       const r={id:draft.id||uuid(), nombre:(draft.nombre||"").trim()||"Ruta del "+fmtShort(draft.fecha||today()), fecha:draft.fecha||today(), ids:draft.ids, cr:draft.cr||new Date().toISOString()};
       DB.rutas=DB.rutas||[]; const k=DB.rutas.findIndex(x=>x.id===r.id); if(k>=0) DB.rutas[k]=r; else DB.rutas.push(r);
-      DB.rutasDirty=true; save(); draft=null; tab="ruta"; stack=[{v:"zonas"},{v:"ruta",rid:r.id}]; ui={}; render(true); return toast("Ruta guardada");
+      markDirty("rutas"); save(); draft=null; tab="ruta"; stack=[{v:"zonas"},{v:"ruta",rid:r.id}]; ui={}; render(true); return toast("Ruta guardada");
     }
   }
   if(d.lista!==undefined){ const [z,p]=d.lista.split("|"); filt="all"; listQ=""; return go({v:"lista",z,p}); }
@@ -963,8 +1104,12 @@ try{ window.claude?.use?.("downloads")?.then(x=>{dl=x;}).catch(()=>{}); }catch(e
 async function saveFile(filename, bytes){
   if(dl) return dl.save({filename, data:bytes});
   if(window.claude) throw {code:"unavailable"};
+  const type=/\.pdf$/i.test(filename)?"application/pdf":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  /* iPhone / iPad: se abre el menú de compartir (Guardar en Archivos, Imprimir, WhatsApp…) */
+  if(/iPhone|iPad|iPod/.test(navigator.userAgent) && navigator.canShare){ const f=new File([bytes],filename,{type});
+    if(navigator.canShare({files:[f]})){ try{ await navigator.share({files:[f], title:filename}); return; }catch(err){ if(err&&err.name==="AbortError") throw err; } } }
   const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  a.href=URL.createObjectURL(new Blob([bytes],{type}));
   a.download=filename; document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },2000);
 }
@@ -1027,6 +1172,7 @@ function accountBox(){
              : `<button class="btn quiet" data-out>Cerrar sesión</button>`;
   return h+`</section>`;
 }
+$("v").addEventListener("input", e=>{ const t=e.target; if(rap && t.dataset && t.dataset.lf && rap.lineas[+t.dataset.li]) rap.lineas[+t.dataset.li][t.dataset.lf]=t.value; });
 $("v").addEventListener("click", async e=>{
   const b=e.target.closest("button"); if(!b) return;
   if(b.hasAttribute("data-out")){ ui.out=true; render(); }
