@@ -476,7 +476,12 @@ const nk = n => n.cr || n.d || "";
 const byAv = (a,b) => a.av.localeCompare(b.av) || nk(a).localeCompare(nk(b));   /* aviso más cercano primero */
 const newest = (a,b) => nk(b).localeCompare(nk(a));                             /* nota más nueva primero */
 const pendNotes = c => c.notes.filter(n=>n.p);
-const dueCount = () => DB.clients.reduce((s,c)=>s+c.notes.filter(n=>n.p && n.av && n.av<=today()).length,0);
+const VOLVER_DIAS=30;
+const lastVisit = c => (c.notes||[]).filter(n=>n.t==="Visita"&&n.d).map(n=>n.d).sort().pop()||"";
+const daysSince = iso => Math.round((new Date(today()+"T12:00")-new Date(iso+"T12:00"))/864e5);
+const haceTxt = n => n<=0?"hoy":n===1?"ayer":`hace ${n} días`;
+const revisitList = () => DB.clients.filter(c=>c.st!=="desc").map(c=>({c,lv:lastVisit(c)})).filter(x=>x.lv && daysSince(x.lv)>=VOLVER_DIAS).sort((a,b)=>a.lv.localeCompare(b.lv));
+const dueCount = () => DB.clients.reduce((s,c)=>s+c.notes.filter(n=>n.p && n.av && n.av<=today()).length,0) + revisitList().length;
 let toastT;
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
 
@@ -666,13 +671,13 @@ const fmtYY = iso => { const [y,m,d]=iso.split("-"); return `${d}/${m}/${y.slice
 const kmNum = v => { const n=parseInt(String(v??"").replace(/\D/g,""),10); return isNaN(n)?"":n; };
 const rapKm = r => kmNum(r.km ?? r.kmFin ?? r.kmIni ?? "");
 const rapKms = r => { const a=kmNum(r.kmIni??""), b=kmNum(r.kmFin??""); return (a!==""&&b!==""&&b>=a) ? b-a : ""; };
-const kmTotTxt = () => { const a=kmNum(rap.kmIni??""), b=kmNum(rap.kmFin??""); if(a===""||b==="") return ""; if(b<a) return "⚠️ Los de llegada son menos que los de salida. Revísalos."; return `Hoy has hecho <b>${(b-a).toLocaleString("es-ES")} km</b>`; };
+const kmTotTxt = () => { const a=kmNum(rap.kmIni??""), b=kmNum(rap.kmFin??""); if(a===""||b==="") return ""; if(b<a) return "⚠️ Los de llegada son menos que los de salida. Revísalos."; return ""; };
 const kmTotUpd = () => { const t=$("rp-kmt"); if(t) t.innerHTML=kmTotTxt(); };
 const addLine = c => rap.lineas.push({cid:c.id, n:c.n, p:title(c.p), m:"Visita comercial"});
 V.rapport = () => {
   const rs=[...(DB.rapports||[])].sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.cr||"").localeCompare(a.cr||""));
   let h=`<button class="btn pri" data-newrap>${ICON.plus}Nuevo rapport</button>`;
-  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const t=rapKms(r), k=rapKm(r), km=t!==""?` · ${t.toLocaleString("es-ES")} km hechos`:(k!==""?` · ${k.toLocaleString("es-ES")} km`:"");
+  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const km="";
     return `<button class="big sm" data-rap="${r.id}"><span><span class="bn">${esc(diaLabel(r.fecha))}</span><span class="bs">${fmtShort(r.fecha)}${km}</span></span><span class="bc">${r.lineas.length}</span></button>`; }).join("")+`</div>`;
   return {t:"Rapport", s:"Visitas del día para la empresa", h};
 };
@@ -735,7 +740,7 @@ function rapPdf(r){
   txt(String(P.nombre).toUpperCase(), 100, top+6, 13);
   txt(fmtYY(r.fecha), R, top+15, 13, {align:"right"});
   txt("MATRICULA:", L, top+24, 10); txt(String(P.matricula), L+25, top+24, 10);
-  doc.setLineWidth(.3); doc.rect(100, top+18, R-100, 8); const kmT=rapKms(r), kmTop = kmT!=="" ? kmT : (r.kmIni==null&&r.kmFin==null&&r.km!=null ? r.km : ""); txt(`KILOMETROS  ${kmTop}`, 102, top+24, 13);
+  doc.setLineWidth(.3); doc.rect(100, top+18, R-100, 8); const kI0=kmNum(r.kmIni??""), kmTop = kI0!=="" ? kI0 : (r.kmIni==null&&r.kmFin==null&&r.km!=null ? r.km : ""); txt(`KILOMETRO  ${kmTop}`, 102, top+24, 13);
   let y=top+32;
   const head=()=>{ doc.setLineWidth(.5); doc.rect(L,y,R-L,6); doc.line(X[1],y,X[1],y+6); doc.line(X[2],y,X[2],y+6);
     txt("CLIENTE",X[0]+1.5,y+4.3,8.5); txt("POBLACION",X[1]+1.5,y+4.3,8.5); txt("MOTIVO DE LA VISITA  / OBSERVACIONES",X[2]+1.5,y+4.3,8.5); y+=6; doc.setLineWidth(.3); };
@@ -743,7 +748,7 @@ function rapPdf(r){
   doc.setFontSize(11);
   const rows=r.lineas.map(l=>{ const a=doc.splitTextToSize(l.n||"",X[1]-X[0]-3), b=doc.splitTextToSize(l.p||"",X[2]-X[1]-3), c=doc.splitTextToSize(l.m||"",X[3]-X[2]-3);
     return {a,b,c,h:Math.max(11, Math.max(a.length,b.length,c.length)*4.6+6)}; });
-  let n=rows.length; { let yy=y; rows.forEach(r=>{ if(yy+r.h>bottom) yy=top+6; yy+=r.h; }); while(yy+11<=270){ n++; yy+=11; } }
+  let n=rows.length; { let yy=y; rows.forEach(r=>{ if(yy+r.h>bottom) yy=top+6; yy+=r.h; }); while(yy+11<=266){ n++; yy+=11; } }
   for(let i=0;i<n;i++){ const row=rows[i]||{a:[],b:[],c:[],h:11};
     if(y+row.h>bottom){ if(!rows[i]) break; doc.addPage(); y=top; head(); }
     doc.rect(L,y,R-L,row.h); doc.line(X[1],y,X[1],y+row.h); doc.line(X[2],y,X[2],y+row.h);
@@ -751,8 +756,7 @@ function rapPdf(r){
     if(row.a.length) doc.text(row.a,X[0]+1.5,y+6.5); if(row.b.length) doc.text(row.b,X[1]+1.5,y+6.5); if(row.c.length) doc.text(row.c,X[2]+1.5,y+6.5);
     y+=row.h; }
 const kI=kmNum(r.kmIni??""), kF=kmNum(r.kmFin??"");
-if(kI!==""||kF!==""){ y+=6; if(y+10>287){ doc.addPage(); y=top; } doc.setLineWidth(.5); doc.rect(L,y,R-L,10); doc.line(75,y,75,y+10); doc.line(135,y,135,y+10);
-txt(`KM SALIDA  ${kI}`, L+2, y+6.8, 11); txt(`KM LLEGADA  ${kF}`, 77, y+6.8, 11); txt(`KM HECHOS  ${kmT}`, 137, y+6.8, 11); }
+y+=12; if(y+8>290){ doc.addPage(); y=top; } doc.setLineWidth(.3); doc.rect(100, y, R-100, 8); txt(`KILOMETROS: ${kF}`, 102, y+6, 13);
 return doc.output("arraybuffer");
 }
 async function rapDownload(){
@@ -783,11 +787,18 @@ V.avisos = () => {
         <button class="act done" data-ndone="${c.id}|${n.id}">${ICON.check}Hecho</button>
       </div></article>`; };
   let h=`<div class="sumrow"><div class="sum hot"><b>${hoy.length}</b><span>Hoy o atrasados</span></div><div class="sum"><b>${prox.length}</b><span>Próximos días</span></div><div class="sum"><b>${sin.length}</b><span>Sin fecha</span></div></div>`;
-  h+=`<h2 class="sec">Para hoy</h2><p class="ord">Primero lo más atrasado</p>`+(hoy.length?hoy.map(item).join(""):`<p class="empty">Nada para hoy.</p>`);
-  h+=`<h2 class="sec">Próximos días</h2><p class="ord">Primero lo más cercano</p>`+(prox.length?prox.map(item).join(""):`<p class="empty">No hay avisos programados. Añade una nota desde la ficha de cada cliente.</p>`);
+  { const nv=revisitList().length; h+=`<button class="big" data-volver style="margin-top:14px${nv?";border-color:var(--orange)":""}"><span><span class="bn">Visitas mensuales pendientes</span><span class="bs">${nv?`${nv} cliente${nv>1?"s":""} a los que toca volver`:"Ahora mismo ninguna"}</span></span><span class="bc">${nv}</span></button>`; }
+h+=`<h2 class="sec">Para hoy</h2><p class="ord">Primero lo más atrasado</p>`+(hoy.length?hoy.map(item).join(""):`<p class="empty">Nada para hoy.</p>`);
+  const rv=revisitList();
+const rvItem=({c,lv})=>{ const tel=telHref(c.t), nd=daysSince(lv); return `<article class="card"><div class="av-top"><span class="tag av due">Toca visitarlo</span><small>Última visita: ${fmtShort(lv)}</small></div><button class="cmain" data-open="${c.id}" style="padding-top:8px"><span class="cname">${esc(c.n)}</span><span class="cinfo">${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""}</span></button><p class="anote">Hace ${nd} días que no vas. Ya toca volver.</p><div class="acts" style="margin-top:12px">${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}<button class="act" data-open="${c.id}">${ICON.doc}Ficha</button><button class="act done" data-visitc="${c.id}">${ICON.check}He estado hoy</button></div></article>`; };
+h+=`<h2 class="sec">Próximos días</h2><p class="ord">Primero lo más cercano</p>`+(prox.length?prox.map(item).join(""):`<p class="empty">No hay avisos programados. Añade una nota desde la ficha de cada cliente.</p>`);
   h+=`<h2 class="sec">Notas sin fecha</h2><p class="ord">Primero la más nueva</p>`+(sin.length?sin.map(item).join(""):`<p class="empty">No hay notas sueltas.</p>`);
-  return {t:"Avisos", s:`${hoy.length} para hoy · ${prox.length} próximos · ${sin.length} sin fecha`, h};
+  return {t:"Avisos", s:`${hoy.length} para hoy · ${rv.length} por visitar · ${prox.length} próximos · ${sin.length} sin fecha`, h};
 };
+V.volver = () => { const rv=revisitList();
+const rvItem=({c,lv})=>{ const tel=telHref(c.t), nd=daysSince(lv); return `<article class="card"><div class="av-top"><span class="tag av due">Toca visitarlo</span><small>Última visita: ${fmtShort(lv)}</small></div><button class="cmain" data-open="${c.id}" style="padding-top:8px"><span class="cname">${esc(c.n)}</span><span class="cinfo">${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""}</span></button><p class="anote">Hace ${nd} días que no vas. Ya toca volver.</p><div class="acts" style="margin-top:12px">${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}<button class="act" data-open="${c.id}">${ICON.doc}Ficha</button><button class="act done" data-visitc="${c.id}">${ICON.check}He estado hoy</button></div></article>`; };
+const h=`<p class="ord" style="margin-top:4px">Clientes a los que no vas desde hace más de un mes. Primero el que más tiempo lleva.</p>`+(rv.length?rv.map(rvItem).join(""):`<p class="empty">Ahora mismo ninguna. Cuando marques «He estado hoy» o «Visitado» en un cliente, al mes te aparecerá aquí para que vuelvas.</p>`);
+return {t:"Visitas mensuales", s:rv.length?`${rv.length} pendiente${rv.length>1?"s":""}`:"Ninguna pendiente", h}; };
 V.buscar = () => ({t:"Buscar", s:"Nombre, pueblo o teléfono",
   h:`<input type="search" id="q" placeholder="Escribe aquí…" value="${esc(searchQ)}" autocomplete="off"><div id="res" style="display:flex;flex-direction:column;gap:14px"></div>`});
 function searchRes(){
@@ -810,6 +821,7 @@ V.ficha = ({id}) => {
   <h2 class="sec">Estado</h2>
   <div class="states">${ORDER.map(s=>`<button class="sbtn st-${s}" data-st="${s}" aria-pressed="${c.st===s}">${EST[s]}</button>`).join("")}</div>
   <button class="btn pri" data-visit>${ICON.check}He estado hoy</button>
+${(()=>{ const lv=lastVisit(c); return lv?`<p class="hint" style="font-size:1.1rem;text-align:center;margin:10px 0 0">Última visita: <b>${fmtShort(lv)}</b> (${haceTxt(daysSince(lv))})</p>`:`<p class="hint" style="font-size:1.05rem;text-align:center;margin:10px 0 0">Todavía no hay ninguna visita apuntada.</p>`; })()}
   <h2 class="sec">Notas y avisos</h2>
   <section class="box">
     <button class="btn pri" data-addnote="${c.id}">${ICON.note}Añadir nota</button>
@@ -1060,7 +1072,9 @@ $("v").onclick=async e=>{
   if(d.open) return go({v:"ficha",id:d.open});
   if(d.copy!==undefined){ try{ await navigator.clipboard.writeText(d.copy); toast("Copiado"); }catch(err){ toast("Mantén el dedo encima para copiar"); } return; }
   if(d.st && c){ c.st=d.st; if(d.st==="vis" && !(c.notes||[]).some(n=>n.d===today()&&n.t==="Visita")){ c.notes=c.notes||[]; c.notes.push(newNote("Visita","",false)); } save(); render(); return toast("Estado: "+EST[d.st]); }
-  if(b.hasAttribute("data-visit") && c){ c.notes=c.notes||[]; if(c.notes.some(n=>n.d===today()&&n.t==="Visita")){ if(c.st==="pend") c.st="vis"; save(); render(); return toast("Ya estaba apuntado que has estado hoy"); } c.notes.push(newNote("Visita","",false)); if(c.st==="pend") c.st="vis"; save(); render(); return toast("Visita de hoy apuntada"); }
+  if(b.hasAttribute("data-volver")) return go({v:"volver"});
+if(d.visitc){ const cc=byId(d.visitc); if(cc){ cc.notes=cc.notes||[]; if(!cc.notes.some(n=>n.d===today()&&n.t==="Visita")) cc.notes.push(newNote("Visita","",false)); if(cc.st==="pend") cc.st="vis"; save(); render(); toast("Apuntado: hoy has estado en "+cc.n); } return; }
+if(b.hasAttribute("data-visit") && c){ c.notes=c.notes||[]; if(c.notes.some(n=>n.d===today()&&n.t==="Visita")){ if(c.st==="pend") c.st="vis"; save(); render(); return toast("Ya estaba apuntado que has estado hoy"); } c.notes.push(newNote("Visita","",false)); if(c.st==="pend") c.st="vis"; save(); render(); return toast("Visita de hoy apuntada"); }
   if(d.addnote){ sheet={type:"note", id:d.addnote, when:"7", txt:""}; return renderSheet(); }
   if(d.editnote){ const [cid,nid]=d.editnote.split("|"), x=byId(cid), n=x&&x.notes.find(y=>y.id===nid); if(!n) return;
     sheet={type:"note", id:cid, nid, txt:n.t, when:n.av?"x":"no", date:n.av||""}; return renderSheet(); }
