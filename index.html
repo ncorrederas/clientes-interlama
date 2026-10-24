@@ -504,6 +504,10 @@ const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerC
 const title = s => String(s||"").toLowerCase().replace(/(^|[\s\-'(])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase()).replace(/\b(De|Del|I|La|Les|Els|El|D')\b/g,w=>w.toLowerCase()).replace(/^./,c=>c.toUpperCase());
 const today = () => new Date().toLocaleDateString("sv-SE");
 const addDays = n => { const d=new Date(); d.setDate(d.getDate()+n); return d.toLocaleDateString("sv-SE"); };
+/* sábado y domingo no se trabaja: la app no avisa ni hace rapports */
+const esFinde = iso => { const g=new Date((iso||today())+"T12:00").getDay(); return g===0||g===6; };
+const finde = () => esFinde(today());
+const laborable = iso => { const d=new Date(iso+"T12:00"); while(d.getDay()===0||d.getDay()===6) d.setDate(d.getDate()+1); return d.toLocaleDateString("sv-SE"); };
 const fmtLong = iso => { const s=new Date(iso+"T12:00").toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}); return s.charAt(0).toUpperCase()+s.slice(1); };
 const fmtShort = iso => { const [y,m,d]=iso.split("-"); return `${d}/${m}/${y}`; };
 const digits = t => String(t||"").split("/")[0].replace(/\D/g,"");
@@ -528,7 +532,7 @@ const lastVisit = c => { let b=(c.notes||[]).filter(n=>n.t==="Visita"&&n.d).map(
 const daysSince = iso => Math.round((new Date(today()+"T12:00")-new Date(iso+"T12:00"))/864e5);
 const haceTxt = n => n<=0?"hoy":n===1?"ayer":`hace ${n} días`;
 const revisitList = () => DB.clients.filter(c=>c.st!=="desc").map(c=>({c,lv:lastVisit(c)})).filter(x=>x.lv && daysSince(x.lv)>=VOLVER_DIAS).sort((a,b)=>a.lv.localeCompare(b.lv));
-const dueCount = () => DB.clients.reduce((s,c)=>s+c.notes.filter(n=>n.p && n.av && n.av<=today()).length,0) + revisitList().length;
+const dueCount = () => finde() ? 0 : DB.clients.reduce((s,c)=>s+c.notes.filter(n=>n.p && n.av && n.av<=today()).length,0) + revisitList().length;
 let toastT;
 document.addEventListener("click",e=>{ if(e.target.id==="toast") e.target.hidden=true; });
 function toast(msg,ms=4000){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,ms); }
@@ -678,7 +682,7 @@ const RAP_RECIENTE=15;
 const HORA_CIERRE=20;
 const rapHoy = () => (DB.rapports||[]).filter(x=>x.fecha===today()).sort((a,b)=>(b.cr||"").localeCompare(a.cr||""))[0];
 const faltaKm = r => kmNum(r.kmFin??"")==="" || kmNum(r.kmIni??"")==="";
-const cierrePend = () => { const r=rapHoy(); return !!(r && (r.lineas||[]).length && faltaKm(r) && new Date().getHours()>=HORA_CIERRE); };
+const cierrePend = () => { if(finde()) return false; const r=rapHoy(); return !!(r && (r.lineas||[]).length && faltaKm(r) && new Date().getHours()>=HORA_CIERRE); };
 function cierreBanner(){
   if(!cierrePend()) return "";
   const r=rapHoy(), n=r.lineas.length;
@@ -689,6 +693,7 @@ function cierreBanner(){
 function marcarVisita(c){
   c.notes=c.notes||[]; const ya=c.notes.some(n=>n.d===today()&&n.t==="Visita");
   if(!ya) c.notes.push(newNote("Visita","",false)); if(c.st==="pend") c.st="vis";
+  if(finde()){ save(); render(); return toast("Visita a "+c.n+" apuntada. Es fin de semana: no se pasa a ningún rapport.", 6000); }
   const r=visitaARapport(c); save(); render();
   toast((ya?"Ya estaba apuntado que has estado hoy en "+c.n:"Visita a "+c.n+" apuntada")+(r.added?" y añadida al rapport de hoy":" · ya estaba en el rapport de hoy")+(r.added?(r.lr?` · última vez: ${fmtShort(r.lr)} (${agoTxt(r.lr)})`:" · es la primera vez"):""), 8000);
 }
@@ -771,7 +776,8 @@ const kmTag = rs => rs.some(faltaKm) ? ` · <b style="color:var(--orange-fg)">fa
 function rapBtn(r){ return `<button class="big sm" data-rap="${r.id}"><span><span class="bn">${esc(diaLabel(r.fecha))}</span><span class="bs">${fmtShort(r.fecha)} · ${r.lineas.length} cliente${r.lineas.length===1?"":"s"}${faltaKm(r)?` · <b style="color:var(--orange-fg)">faltan los km</b>`:""}</span></span><span class="bc">${r.lineas.length}</span></button>`; }
 V.rapport = () => {
   const rs=rapsOrd(), hayHoy=rs.some(r=>r.fecha===today());
-  let h=cierreBanner()+`<button class="btn pri" data-newrap>${hayHoy?ICON.doc+"Abrir el rapport de hoy":ICON.plus+"Nuevo rapport"}</button>`;
+  let h=finde() ? `<p class="banner" style="margin:0">Hoy es fin de semana: no hay rapport. El próximo, el lunes.</p>`
+    : cierreBanner()+`<button class="btn pri" data-newrap>${hayHoy?ICON.doc+"Abrir el rapport de hoy":ICON.plus+"Nuevo rapport"}</button>`;
   const meses=[...new Set(rs.map(r=>r.fecha.slice(0,7)))];
   if(meses.length){ h+=`<h2 class="sec">Rapports guardados</h2><div class="grid">`+meses.map(ym=>{ const m=rs.filter(r=>r.fecha.startsWith(ym)), ns=new Set(m.map(r=>lunes(r.fecha))).size;
       return `<button class="big" data-rmes="${ym}"${ym===today().slice(0,7)?' style="border-color:var(--brand)"':""}><span><span class="bn">${mesTxt(ym)}</span><span class="bs">${m.length} rapport${m.length===1?"":"s"} · ${ns} semana${ns===1?"":"s"}${kmTag(m)}</span></span><span class="bc">${m.length}</span></button>`; }).join("")+`</div>`; }
@@ -912,8 +918,9 @@ async function rapDownload(){
 V.avisos = () => {
   const t=today(), all=[];
   DB.clients.forEach(c=>pendNotes(c).forEach(n=>all.push({c,n})));
-  const hoy=all.filter(x=>x.n.av && x.n.av<=t).sort((a,b)=>byAv(a.n,b.n));
-  const prox=all.filter(x=>x.n.av && x.n.av>t).sort((a,b)=>byAv(a.n,b.n));
+  const fs=finde();
+  const hoy=fs?[]:all.filter(x=>x.n.av && x.n.av<=t).sort((a,b)=>byAv(a.n,b.n));
+  const prox=all.filter(x=>x.n.av && (fs || x.n.av>t)).sort((a,b)=>byAv(a.n,b.n));
   const sin=all.filter(x=>!x.n.av).sort((a,b)=>newest(a.n,b.n));
   const item=({c,n})=>{ const tel=telHref(c.t), h=hhmm(n.cr);
     const tag=!n.av?`<span class="tag nodate">Sin fecha</span>`:`<span class="tag av${n.av<=t?" due":""}">${esc(avLabel(n.av))}</span>`;
@@ -929,15 +936,16 @@ V.avisos = () => {
       </div></article>`; };
   let h=cierreBanner()+`<div class="sumrow"><div class="sum hot"><b>${hoy.length}</b><span>Hoy o atrasados</span></div><div class="sum"><b>${prox.length}</b><span>Próximos días</span></div><div class="sum"><b>${sin.length}</b><span>Sin fecha</span></div></div>`;
   h+="<!--RV-->";
-h+=`<h2 class="sec">Para hoy</h2><p class="ord">Primero lo más atrasado</p>`+(hoy.length?hoy.map(item).join(""):`<p class="empty">Nada para hoy.</p>`);
-  const rv=revisitList();
+h+= fs ? `<p class="banner" style="margin:0">Hoy es fin de semana: no hay avisos. Lo pendiente te saldrá el lunes.</p>`
+  : `<h2 class="sec">Para hoy</h2><p class="ord">Primero lo más atrasado</p>`+(hoy.length?hoy.map(item).join(""):`<p class="empty">Nada para hoy.</p>`);
+  const rv=fs?[]:revisitList();
 const rvItem=({c,lv})=>{ const tel=telHref(c.t), nd=daysSince(lv); return `<article class="card"><div class="av-top"><span class="tag av due">${nd>=60?"Hace más de "+Math.floor(nd/30)+" meses":"Hace más de un mes"}</span><small>Última visita: ${fmtShort(lv)}</small></div><button class="cmain" data-open="${c.id}" style="padding-top:8px"><span class="cname">${esc(c.n)}</span><span class="cinfo">${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""}</span></button><p class="anote">Hace ${nd} días que no visitas a <b>${esc(c.n)}</b>. Ya toca volver.</p><div class="acts" style="margin-top:12px">${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}<button class="act" data-open="${c.id}">${ICON.doc}Ficha</button><button class="act done" data-visitc="${c.id}">${ICON.check}He estado hoy</button></div></article>`; };
   h=h.replace("<!--RV-->", rv.length ? `<h2 class="sec">Más de un mes sin visitar</h2><p class="banner" style="margin:0">Hace más de un mes que no visitas a ${rv.length===1?"este cliente":"estos "+rv.length+" clientes"}. Primero el que más tiempo lleva.</p>`+rv.map(rvItem).join("") : "");
 h+=`<h2 class="sec">Próximos días</h2><p class="ord">Primero lo más cercano</p>`+(prox.length?prox.map(item).join(""):`<p class="empty">No hay avisos programados. Añade una nota desde la ficha de cada cliente.</p>`);
   h+=`<h2 class="sec">Notas sin fecha</h2><p class="ord">Primero la más nueva</p>`+(sin.length?sin.map(item).join(""):`<p class="empty">No hay notas sueltas.</p>`);
   return {t:"Avisos", s:`${hoy.length} para hoy · ${rv.length} por visitar · ${prox.length} próximos · ${sin.length} sin fecha`, h};
 };
-V.volver = () => { const rv=revisitList();
+V.volver = () => { const rv=finde()?[]:revisitList();
 const rvItem=({c,lv})=>{ const tel=telHref(c.t), nd=daysSince(lv); return `<article class="card"><div class="av-top"><span class="tag av due">Toca visitarlo</span><small>Última visita: ${fmtShort(lv)}</small></div><button class="cmain" data-open="${c.id}" style="padding-top:8px"><span class="cname">${esc(c.n)}</span><span class="cinfo">${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""}</span></button><p class="anote">Hace ${nd} días que no vas. Ya toca volver.</p><div class="acts" style="margin-top:12px">${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}<button class="act" data-open="${c.id}">${ICON.doc}Ficha</button><button class="act done" data-visitc="${c.id}">${ICON.check}He estado hoy</button></div></article>`; };
 const h=`<p class="ord" style="margin-top:4px">Clientes a los que no vas desde hace más de un mes. Primero el que más tiempo lleva.</p>`+(rv.length?rv.map(rvItem).join(""):`<p class="empty">Ahora mismo ninguna. Cuando marques «He estado hoy» o «Visitado» en un cliente, al mes te aparecerá aquí para que vuelvas.</p>`);
 return {t:"Visitas mensuales", s:rv.length?`${rv.length} pendiente${rv.length>1?"s":""}`:"Ninguna pendiente", h}; };
@@ -1014,7 +1022,10 @@ function compras(c){
 
 /* ---------- hojas: nota y pedido ---------- */
 const PRESETS=["Volver a llamar","Pasar a visitarle","Enviar presupuesto","Llevar muestrario"];
-const WHEN=[["no","Sin fecha"],["0","Hoy"],["1","Mañana"],["7","En 1 semana"],["14","En 2 semanas"],["x","Otra fecha"]];
+const WHEN0=[["no","Sin fecha"],["0","Hoy"],["1","Mañana"],["7","En 1 semana"],["14","En 2 semanas"],["x","Otra fecha"]];
+/* si «Hoy» o «Mañana» caen en fin de semana, el botón dice «El lunes» (y solo sale uno) */
+const whenList = () => { const out=[], seen={};
+  WHEN0.forEach(([k,l])=>{ if(k==="0"||k==="1"){ const f=laborable(addDays(+k)); if(f!==addDays(+k)) l="El lunes"; if(seen[f]) return; seen[f]=1; } out.push([k,l]); }); return out; };
 function sheetHtml(){
   if(!sheet) return "";
   const c=byId(sheet.id); if(!c){ sheet=null; return ""; }
@@ -1025,7 +1036,7 @@ function sheetHtml(){
     <div class="pills">${PRESETS.map(p=>`<button class="pill" data-preset="${esc(p)}">${p}</button>`).join("")}</div>
     <label class="lbl">Nota<textarea id="ntxt" placeholder="${SR?"Toca el micrófono y habla, o escribe aquí":"Escribe aquí"}">${esc(sheet.txt||"")}</textarea></label>
     <div class="lbl">¿Cuándo te aviso?</div>
-    <div class="when">${WHEN.map(([k,l])=>`<button class="btn" data-when="${k}" aria-pressed="${sheet.when===k}">${l}</button>`).join("")}</div>
+    <div class="when">${whenList().map(([k,l])=>`<button class="btn" data-when="${k}" aria-pressed="${sheet.when===k}">${l}</button>`).join("")}</div>
     ${sheet.when==="x"?`<label class="lbl">Fecha del aviso<input type="date" id="ndate" min="${today()}" value="${esc(sheet.date||addDays(3))}"></label>`:""}
     <p class="hint" style="font-size:.95rem">${sheet.when==="no"?"Saldrá en Avisos, en «Notas sin fecha».":"Saldrá en Avisos el día que elijas."}</p>
     <div class="row2"><button class="btn" data-cancel>Cancelar</button><button class="btn pri" data-savenote>${sheet.nid?"Guardar cambios":"Guardar nota"}</button></div>
@@ -1073,11 +1084,12 @@ $("sheet").onclick=e=>{
   if(d.ndelyes!==undefined){ c.notes=c.notes.filter(x=>x.id!==sheet.nid); sheet=null; save(); render(); return toast("Nota borrada"); }
   if(d.savenote!==undefined){
     const t=($("ntxt").value||"").trim(); if(!t){ $("ntxt").focus(); return toast("Escribe algo en la nota"); }
-    const w=sheet.when, av = w==="no" ? "" : w==="x" ? (($("ndate")||{}).value||"") : addDays(+w);
-    if(w==="x" && !av) return toast("Elige la fecha del aviso");
+    const w=sheet.when, av0 = w==="no" ? "" : w==="x" ? (($("ndate")||{}).value||"") : addDays(+w);
+    if(w==="x" && !av0) return toast("Elige la fecha del aviso");
+    const av = av0 ? laborable(av0) : "";
     if(sheet.nid){ const n=c.notes.find(x=>x.id===sheet.nid); if(n){ n.t=t; n.av=av; n.p=true; } sheet=null; save(); render(); return toast("Nota cambiada"); }
     c.notes.push(newNote(t,av)); sheet=null; save(); render();
-    return toast(av ? "Nota guardada. Te avisará "+(av===today()?"hoy":av===addDays(1)?"mañana":"el "+fmtShort(av)) : "Nota guardada en Avisos");
+    return toast(av ? "Nota guardada. Te avisará "+(av===today()?"hoy":av===addDays(1)?"mañana":"el "+fmtLong(av).toLowerCase())+(av!==av0?" (el fin de semana no hay avisos)":"") : "Nota guardada en Avisos");
   }
   if(d.saveord!==undefined){
     const raw=($("oimp").value||"").trim().replace(/[€\s]/g,""), imp=parseFloat(raw.includes(",")?raw.replace(/\./g,"").replace(",","."):raw);
@@ -1273,7 +1285,7 @@ $("v").onclick=async e=>{
   if(b.hasAttribute("data-delruta")){ ui.delRuta=true; return render(); }
   if(b.hasAttribute("data-delrutano")){ ui.delRuta=false; return render(); }
   if(b.hasAttribute("data-delrutayes")){ DB.rutas=DB.rutas.filter(r=>r.id!==view.rid); markDirty("rutas"); save(); stack=[{v:"zonas"}]; ui={}; render(true); return toast("Ruta borrada"); }
-  if(b.hasAttribute("data-newrap")){ const f=today();
+  if(b.hasAttribute("data-newrap")){ if(finde()) return toast("Es fin de semana: no hay rapport."); const f=today();
     /* si ya hay rapport de hoy (por ejemplo, creado con «He estado hoy»), se abre ese en vez de empezar uno vacío */
     const hoy=(DB.rapports||[]).filter(x=>x.fecha===f).sort((x,y)=>(y.cr||"").localeCompare(x.cr||""))[0];
     if(hoy){ rap=JSON.parse(JSON.stringify(hoy)); rap.kmIni=hoy.kmIni!=null?String(hoy.kmIni):""; rap.kmFin=hoy.kmFin!=null?String(hoy.kmFin):""; delete rap.km; rq=""; return go({v:"rapEd"}); } const last=(DB.rapports||[]).slice().sort((x,y)=>(y.fecha||"").localeCompare(x.fecha||"")||(y.cr||"").localeCompare(x.cr||""))[0]; rap={id:null, fecha:f, kmIni:last?rapKm(last):"", kmFin:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
