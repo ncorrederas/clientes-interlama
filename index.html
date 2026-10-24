@@ -1099,9 +1099,17 @@ function tipoNeg(t){ const n=norm(t.name||""); if(/persian/.test(n)) return "Per
 async function buscarOSM(lat,lon,km){
   const R=Math.round(km*1000), A=`(around:${R},${lat},${lon})`, N='"alumin|persian|tancament|toldo|serralleri|cerrajer|fusteria met|carpinteria met|ventana|finestr"';
   const q=`[out:json][timeout:25];(nwr${A}["craft"~"metal_construction|window_construction|glaziery"];nwr${A}["name"~${N},i];nwr${A}["craft"~"carpenter|joiner"]["name"~"alumin|met",i];);out center tags 120;`;
-  const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"}});
-  if(!r.ok) throw new Error("osm "+r.status);
-  return (await r.json()).elements||[];
+  /* los servidores gratuitos a veces están saturados: se prueban varios, cada uno con tiempo máximo */
+  const SRV=["https://overpass-api.de/api/interpreter","https://overpass.private.coffee/api/interpreter","https://maps.mail.ru/osm/tools/overpass/api/interpreter"];
+  for(let i=0;i<SRV.length;i++){
+    cerca.srv=i+1; const st=document.getElementById("cstat"); if(st) st.textContent=`Buscando negocios… (servidor ${i+1} de ${SRV.length})`;
+    const ac=new AbortController(), to=setTimeout(()=>ac.abort(),15000);
+    try{ const r=await fetch(SRV[i],{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"},signal:ac.signal});
+      if(r.ok){ const j=await r.json(); if(j && Array.isArray(j.elements)) return j.elements; } }
+    catch(e){ console.warn("osm",SRV[i],e); }
+    finally{ clearTimeout(to); }
+  }
+  throw {msg:"El mapa libre está saturado ahora mismo. Busca en Google Maps con los botones de abajo, o prueba otra vez en un rato.", osm:true};
 }
 function prepara(els,lat,lon){
   const seen=new Set(), out=[]; let ya=0;
@@ -1135,14 +1143,21 @@ async function cercaBuscar(demo){
   }
   render();
 }
+/* búsquedas en Google Maps (abre la app de Maps; gratis) */
+const GM_BUSQ=["Carpintería de aluminio","Persianas","Cerrajería","Toldos"];
+function gmapsBox(aqui){
+  const donde = aqui ? " cerca de "+title(aqui) : "";
+  return `<h2 class="sec">Buscar en Google Maps</h2><p class="ord">Se abre Google Maps con la búsqueda${aqui?" alrededor de "+esc(title(aqui)):" cerca de donde estás"}</p>
+  <div class="row2">${GM_BUSQ.map(b=>`<a class="btn" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b+donde)}" target="_blank" rel="noopener">${ICON.pin}${b}</a>`).join("")}</div>`;
+}
 V.cerca = () => {
   const aqui=cerca.lat!=null?puebloCerca(cerca.lat,cerca.lon):"";
   let h=`<p class="hint">Busca carpinterías de aluminio, persianas, toldos y cerrajerías a tu alrededor que <b>todavía no son clientes tuyos</b>.</p>
   <div class="chips" role="group" aria-label="Distancia">${RADIOS.map(r=>`<button class="chip" data-radio="${r}" aria-pressed="${cerca.radio===r}">A ${r} km</button>`).join("")}</div>
   <button class="btn pri big-vis" data-cbuscar>${ICON.pin}${cerca.st==="ok"?"Buscar otra vez":"Buscar a mi alrededor"}</button>`;
   if(cerca.st==="gps") h+=`<p class="empty"><span class="spin"></span>Mirando dónde estás…</p>`;
-  if(cerca.st==="busca") h+=`<p class="empty"><span class="spin"></span>Buscando negocios cerca${aqui?" de "+esc(title(aqui)):""}…</p>`;
-  if(cerca.st==="err") h+=`<p class="banner">${esc(cerca.msg)}</p>${window.__demoCerca?`<button class="btn" data-cdemo>Probar con una ubicación de ejemplo (Granollers)</button>`:""}`;
+  if(cerca.st==="busca") h+=`<p class="empty"><span class="spin"></span><span id="cstat">Buscando negocios cerca${aqui?" de "+esc(title(aqui)):""}…</span></p>`;
+  if(cerca.st==="err") h+=`<p class="banner">${esc(cerca.msg)}</p>`+gmapsBox(aqui)+`${window.__demoCerca?`<button class="btn" data-cdemo>Probar con una ubicación de ejemplo (Granollers)</button>`:""}`;
   if(cerca.st==="ok"){
     const maps=`https://www.google.com/maps/search/carpinter%C3%ADa+de+aluminio/@${cerca.lat},${cerca.lon},13z`;
     h+=`<h2 class="sec">${cerca.items.length} posible${cerca.items.length===1?"":"s"} cliente${cerca.items.length===1?"":"s"}${aqui?" cerca de "+esc(title(aqui)):""}</h2>
@@ -1157,9 +1172,9 @@ V.cerca = () => {
           <button class="act vis" data-cadd="${i}">${ICON.plus}Añadir cliente</button>
         </div></article>`; }).join("")
       : `<p class="empty">No he encontrado negocios nuevos en el mapa a ${cerca.radio} km. Prueba con más distancia o mira en Google Maps.</p>`;
-    h+=`<a class="btn" href="${maps}" target="_blank" rel="noopener">${ICON.pin}Ver más en Google Maps</a>
-    <p class="hint" style="font-size:.9rem">Los datos salen de OpenStreetMap, que no tiene todos los negocios. Google Maps suele tener más.</p>`;
+    h+=`<p class="hint" style="font-size:.9rem">Estos datos salen de un mapa libre que no tiene todos los negocios. En Google Maps suele haber más:</p>`+gmapsBox(aqui);
   }
+  if(cerca.st!=="err" && cerca.st!=="ok") h+=gmapsBox(aqui);
   return {t:"Posibles clientes", s:aqui?"Cerca de "+title(aqui):"Negocios del sector a tu alrededor", h};
 };
 
