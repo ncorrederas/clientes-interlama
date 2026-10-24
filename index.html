@@ -160,7 +160,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:12px 20px;border-radius:12px;font-weight:700;z-index:20;max-width:calc(100% - 32px);text-align:center}
 
 /* notas, avisos, dictado y compras */
-.toast{z-index:40}
+.toast{z-index:40;font-size:1.1rem;padding:14px 20px;cursor:pointer;width:min(calc(100% - 32px),520px)}
 .card.hasdel.hasnote .cmain{padding-right:100px}
 .cnote{all:unset;cursor:pointer;position:absolute;top:6px;right:50px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;color:var(--brand);background:var(--bg);z-index:1}
 .cnote svg{width:22px;height:22px}
@@ -190,6 +190,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand)}
 .tag.nodate{color:var(--muted);background:var(--bg);border:2px solid var(--line)}
 .acts.a4{grid-template-columns:repeat(4,1fr)}
 .acts.a4 .act{font-size:.9rem;padding:6px 2px}
+.acts.c4{grid-template-columns:repeat(4,1fr)}
+.acts.c4 .act{font-size:.88rem;padding:6px 2px}
+.act.vis{color:var(--s-ped)}
+.big .bc svg{width:34px;height:34px}
+.btn.big-vis{min-height:76px;font-size:1.3rem}
+.btn.big-vis svg{width:30px;height:30px}
+.btn.big-vis.on{background:var(--s-ped-bg);color:var(--s-ped);border-color:var(--s-ped)}
+.act.vis.on{background:var(--s-ped-bg)}
 .act.done{color:var(--s-ped)}
 .nedit{all:unset;cursor:pointer;font-weight:700;font-size:.95rem;color:var(--brand);padding:6px 0;text-decoration:underline}
 .notes li.hasav{border-left-color:var(--orange)}
@@ -227,6 +235,20 @@ body.nohead main{padding-top:calc(16px + env(safe-area-inset-top,0px))}
 .rn{flex:1;min-width:0;display:flex;flex-direction:column}
 .rn b{font:700 1.15rem/1.15 var(--display);overflow-wrap:anywhere}
 .rn small{color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}
+.uv{display:block;margin-top:6px;background:var(--bg);border:2px solid var(--line);border-radius:10px;padding:6px 10px;font-size:.95rem;color:var(--fg)}
+.uv b{font-variant-numeric:tabular-nums}
+.uv.warn{background:var(--orange-bg);border-color:var(--orange);color:var(--orange-fg)}
+.rn small.lr{font-weight:700;margin-top:2px}
+.rn small.lr.warn{color:var(--orange-fg);background:var(--orange-bg);border-radius:6px;padding:1px 7px;align-self:flex-start}
+.foto .ft{font:700 1.3rem/1.1 var(--display);margin:0}
+.foto label.btn{min-height:64px}
+.fstat{display:flex;gap:12px;align-items:center}
+.fstat img{width:84px;height:84px;object-fit:cover;border-radius:12px;border:2px solid var(--line);flex:0 0 auto}
+.fstat p{margin:0;font-weight:700}
+.fstat .fo{font-weight:400;color:var(--muted);font-size:.95rem;margin-top:4px;overflow-wrap:anywhere}
+.spin{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:-5px;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+input.ai,select.ai{background:var(--orange-bg);border-color:var(--orange)}
 .rctl{display:flex;gap:4px;flex:0 0 auto}
 .ib{all:unset;cursor:pointer;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid var(--line);color:var(--fg)}
 .ib svg{width:20px;height:20px}
@@ -242,6 +264,26 @@ body.nohead main{padding-top:calc(16px + env(safe-area-inset-top,0px))}
 input.rin{min-height:48px;padding:8px 12px;font-size:1rem}
 .pills .pill[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 
+/* hoja del rapport para imprimir (solo se ve en papel) */
+#printarea{display:none}
+@media print{
+  @page{size:A4;margin:12mm 14mm}
+  body{background:#fff!important}
+  body>*:not(#printarea){display:none!important}
+  #printarea{display:block;color:#000;font:11pt/1.3 Helvetica,Arial,sans-serif}
+  #printarea .ph1{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+  #printarea .pt{font-size:20pt;font-weight:400}
+  #printarea .pn{font-size:13pt;flex:1;margin-left:20mm}
+  #printarea .ph2{display:flex;justify-content:space-between;margin-top:4mm;font-size:10pt}
+  #printarea .pd{font-size:13pt}
+  #printarea .pk{border:1px solid #000;padding:2mm 3mm;font-size:13pt;margin:3mm 0 4mm auto;width:52%}
+  #printarea .pk2{margin-top:8mm}
+  #printarea .ptab{width:100%;border-collapse:collapse;table-layout:fixed}
+  #printarea .ptab th{border:1.5px solid #000;font-size:8.5pt;font-weight:400;text-align:left;padding:1.5mm}
+  #printarea .ptab th:nth-child(1){width:29%} #printarea .ptab th:nth-child(2){width:18%}
+  #printarea .ptab td{border:1px solid #000;height:15mm;vertical-align:top;padding:2mm 1.5mm;font-size:11pt;overflow-wrap:anywhere}
+  #printarea .ptab tr{break-inside:avoid}
+}
 /* pantalla de entrada: solo fondo rojo y los campos */
 body.login{background:var(--brand)}
 body.login .top{display:none}
@@ -270,7 +312,7 @@ body.login main{min-height:100vh;min-height:100dvh;justify-content:center;paddin
   <button class="tab" data-tab="avisos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Avisos<span class="badge" id="badge" hidden></span></button>
   <button class="tab" data-tab="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Buscar</button>
   <button class="tab" data-tab="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M10.3 3h3.4l.5 2.5 1.8.8 2.2-1.4 2.4 2.4-1.4 2.2.8 1.8 2.5.5v3.4l-2.5.5-.8 1.8 1.4 2.2-2.4 2.4-2.2-1.4-1.8.8-.5 2.5h-3.4l-.5-2.5-1.8-.8-2.2 1.4-2.4-2.4 1.4-2.2-.8-1.8L1.5 13.7v-3.4l2.5-.5.8-1.8-1.4-2.2 2.4-2.4 2.2 1.4 1.8-.8z"/><circle cx="12" cy="12" r="3.2"/></svg>Ajustes</button>
-  <button class="tab" data-tab="rapport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10.5h7M8.5 14h7M8.5 17.5h4"/></svg>Rapport</button>
+  <button class="tab" data-tab="rapport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4.5" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10.5h7M8.5 14h7M8.5 17.5h4"/></svg>Rapport<span class="badge" id="rbadge" hidden>km</span></button>
   <button class="tab new" data-tab="nuevo"><span class="plus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Nuevo</button>
 </nav>
 <div id="sheet"></div>
@@ -291,6 +333,9 @@ const ICON = {
   pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
   trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
   euro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M17 6.5A6.5 6.5 0 1 0 17 17.5"/><path d="M4.5 10.5h9M4.5 13.5h9"/></svg>',
+  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  img:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M4 17l5-4.5 4 3.5 3-2.5 4 3.5"/></svg>',
+  print:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M7 9V3.5h10V9"/><rect x="3.5" y="9" width="17" height="8" rx="1.5"/><path d="M7 14h10v6.5H7z"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
@@ -477,13 +522,16 @@ const byAv = (a,b) => a.av.localeCompare(b.av) || nk(a).localeCompare(nk(b));   
 const newest = (a,b) => nk(b).localeCompare(nk(a));                             /* nota más nueva primero */
 const pendNotes = c => c.notes.filter(n=>n.p);
 const VOLVER_DIAS=30;
-const lastVisit = c => (c.notes||[]).filter(n=>n.t==="Visita"&&n.d).map(n=>n.d).sort().pop()||"";
+/* última visita: el último «He estado hoy» o el último rapport en el que sale el cliente */
+const lastVisit = c => { let b=(c.notes||[]).filter(n=>n.t==="Visita"&&n.d).map(n=>n.d).sort().pop()||"";
+  (DB.rapports||[]).forEach(r=>{ if(r.fecha>b && r.fecha<=today() && (r.lineas||[]).some(l=>l.cid===c.id)) b=r.fecha; }); return b; };
 const daysSince = iso => Math.round((new Date(today()+"T12:00")-new Date(iso+"T12:00"))/864e5);
 const haceTxt = n => n<=0?"hoy":n===1?"ayer":`hace ${n} días`;
 const revisitList = () => DB.clients.filter(c=>c.st!=="desc").map(c=>({c,lv:lastVisit(c)})).filter(x=>x.lv && daysSince(x.lv)>=VOLVER_DIAS).sort((a,b)=>a.lv.localeCompare(b.lv));
 const dueCount = () => DB.clients.reduce((s,c)=>s+c.notes.filter(n=>n.p && n.av && n.av<=today()).length,0) + revisitList().length;
 let toastT;
-function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,2600); }
+document.addEventListener("click",e=>{ if(e.target.id==="toast") e.target.hidden=true; });
+function toast(msg,ms=4000){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,ms); }
 
 /* ---------- navegación ---------- */
 let tab="ruta", stack=[{v:"zonas"}], filt="all", searchQ="", ui={};
@@ -493,6 +541,7 @@ function go(view){ micKill(); sheet=null; stack.push(view); ui={}; render(true);
 function back(){ micKill(); sheet=null; if(stack.length>1){ stack.pop(); ui={}; render(true); } }
 function setTab(t){ micKill(); sheet=null; tab=t; ui={};
   stack = t==="ruta"?[{v:"zonas"}] : t==="avisos"?[{v:"avisos"}] : t==="buscar"?[{v:"buscar"}] : t==="ajustes"?[{v:"ajustes"}] : t==="rapport"?[{v:"rapport"}] : [{v:"form",id:null}];
+  if(t==="nuevo") fotoReset();
   render(true); }
 
 /* ---------- piezas ---------- */
@@ -512,10 +561,11 @@ function card(c, extra="", canDel=false){
     ${c.t?`<div class="cphone"><button class="pnum" data-pmenu="${c.id}" aria-expanded="${ui.pmenu===c.id}">${ICON.phone}<span>${esc(c.t)}</span></button>
       ${ui.pmenu===c.id?`<div class="pmenu">${tel?`<a class="btn call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:""}<button class="btn" data-copy="${esc(c.t)}">Copiar número</button></div>`:""}</div>`:""}
     ${extra}
-    <div class="acts">
+    <div class="acts c4">
       ${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}
       ${isMobile(c.t)?`<a class="act wa" href="${waHref(c.t)}" target="_blank" rel="noopener">${ICON.wa}WhatsApp</a>`:`<span class="act" aria-disabled="true">${ICON.wa}Es un fijo</span>`}
       <button class="act" data-open="${c.id}">${ICON.doc}Ficha</button>
+      ${(c.notes||[]).some(n=>n.d===today()&&n.t==="Visita")?`<button class="act vis on" data-visitc="${c.id}">${ICON.check}Visitado hoy</button>`:`<button class="act vis" data-visitc="${c.id}">${ICON.check}He estado hoy</button>`}
     </div>
   </article>`;
 }
@@ -526,7 +576,7 @@ const sortN = (a,b)=>a.n.localeCompare(b.n,"es");
 const V = {};
 V.zonas = () => {
   const due = dueCount();
-  let h = syncBanner();
+  let h = syncBanner() + cierreBanner();
   if(due) h += `<button class="big" data-tab="avisos" style="border-color:var(--orange)"><span><span class="bn">Tienes ${due} aviso${due>1?"s":""} para hoy</span><span class="bs">Toca para verlos</span></span><span class="bc">${due}</span></button>`;
   h += `<h2 class="sec" style="margin-top:0">Por zonas</h2><div class="grid">`;
   ZONAS.forEach(z=>{ const a=DB.clients.filter(c=>c.z===z); if(!a.length) return;
@@ -539,6 +589,7 @@ V.zonas = () => {
       return `<button class="big sm" data-ruta="${r.id}"${r.fecha===today()?' style="border-color:var(--brand)"':""}><span><span class="bn">${esc(r.nombre)}</span><span class="bs">${esc(diaLabel(r.fecha))} · ${np} pueblo${np===1?"":"s"}</span></span><span class="bc">${cs.length}</span></button>`; }).join("")+`</div>`
     : "";
   h += `<button class="btn pri" data-newruta>${ICON.plus}Crear ruta</button>`;
+  h += `<h2 class="sec">Clientes nuevos</h2><button class="big" data-cerca><span><span class="bn">Posibles clientes</span><span class="bs">Carpinterías de aluminio y persianas cerca de donde estás</span></span><span class="bc">${ICON.pin}</span></button>`;
   return {t:"Mi ruta", s:`${DB.clients.length} clientes`, h};
 };
 V.pueblos = ({z}) => {
@@ -619,7 +670,43 @@ function rselHtml(){
       <button class="ib x" data-rdel="${c.id}" aria-label="Quitar ${esc(c.n)} de la ruta">${ICON.x}</button></span></li>`).join("")}</ol>`;
 }
 const selIds = () => cur().v==="rapEd" && rap ? rap.lineas.map(l=>l.cid).filter(Boolean) : (draft ? draft.ids : []);
+/* último rapport guardado (distinto del que se está editando) en el que salió este cliente */
+function lastRap(cid){ let best=""; (DB.rapports||[]).forEach(r=>{ if(rap && rap.id && r.id===rap.id) return; if(r.fecha>best && (r.lineas||[]).some(l=>l.cid===cid)) best=r.fecha; }); return best; }
+const agoTxt = f => { const d=daysAgo(f); return d<0?"el "+fmtShort(f) : d===0?"hoy" : d===1?"ayer" : "hace "+d+" días"; };
+const RAP_RECIENTE=15;
+/* cierre del día: a partir de las 20:00 el rapport de hoy ya tiene los clientes; solo faltan los km */
+const HORA_CIERRE=20;
+const rapHoy = () => (DB.rapports||[]).filter(x=>x.fecha===today()).sort((a,b)=>(b.cr||"").localeCompare(a.cr||""))[0];
+const faltaKm = r => kmNum(r.kmFin??"")==="" || kmNum(r.kmIni??"")==="";
+const cierrePend = () => { const r=rapHoy(); return !!(r && (r.lineas||[]).length && faltaKm(r) && new Date().getHours()>=HORA_CIERRE); };
+function cierreBanner(){
+  if(!cierrePend()) return "";
+  const r=rapHoy(), n=r.lineas.length;
+  return `<button class="big" data-cierre style="border-color:var(--orange);background:var(--orange-bg)"><span><span class="bn">Tu rapport de hoy ya está hecho</span><span class="bs" style="color:var(--orange-fg);font-weight:700">${n} cliente${n>1?"s":""} visitado${n>1?"s":""}. Solo falta poner los kilómetros.</span></span><span class="bc">${ICON.doc}</span></button>`;
+}
+/* «He estado hoy» en la ficha: el cliente entra solo en el rapport de hoy (si no hay, se crea) */
+/* «He estado hoy» (desde la ficha o desde la tarjeta): apunta la visita y la pasa al rapport del día */
+function marcarVisita(c){
+  c.notes=c.notes||[]; const ya=c.notes.some(n=>n.d===today()&&n.t==="Visita");
+  if(!ya) c.notes.push(newNote("Visita","",false)); if(c.st==="pend") c.st="vis";
+  const r=visitaARapport(c); save(); render();
+  toast((ya?"Ya estaba apuntado que has estado hoy en "+c.n:"Visita a "+c.n+" apuntada")+(r.added?" y añadida al rapport de hoy":" · ya estaba en el rapport de hoy")+(r.added?(r.lr?` · última vez: ${fmtShort(r.lr)} (${agoTxt(r.lr)})`:" · es la primera vez"):""), 8000);
+}
+function visitaARapport(c){
+  const f=today(), lr=lastRap(c.id);
+  DB.rapports=DB.rapports||[];
+  let r=DB.rapports.filter(x=>x.fecha===f).sort((a,b)=>(b.cr||"").localeCompare(a.cr||""))[0];
+  if(r && (r.lineas||[]).some(l=>l.cid===c.id)) return {added:false, lr};
+  const line={cid:c.id, n:c.n, p:title(c.p), m:"Visita comercial"};
+  if(r){ r.lineas.push(line); }
+  else { const last=DB.rapports.slice().sort((x,y)=>(y.fecha||"").localeCompare(x.fecha||"")||(y.cr||"").localeCompare(x.cr||""))[0];
+    r={id:uuid(), fecha:f, kmIni:last?rapKm(last):"", kmFin:"", lineas:[line], cr:new Date().toISOString()}; DB.rapports.push(r); }
+  if(rap && rap.id===r.id && !rap.lineas.some(l=>l.cid===c.id)) rap.lineas.push({...line});
+  markDirty("rapports"); return {added:true, lr};
+}
 function rrow(c){ const on=selIds().includes(c.id);
+  if(cur().v==="rapEd"){ const lr=lastRap(c.id), w=lr && daysAgo(lr)<RAP_RECIENTE;
+    return `<li class="rrow"><span class="rn"><b>${esc(c.n)}</b><small>${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""} · ${EST[c.st]}</small>${lr?`<small class="lr${w?" warn":""}">Último rapport: ${agoTxt(lr)} (${fmtShort(lr)})</small>`:""}</span><button class="addb" data-rtog="${c.id}" aria-pressed="${on}">${on?"✓ Añadido":"+ Añadir"}</button></li>`; }
   return `<li class="rrow"><span class="rn"><b>${esc(c.n)}</b><small>${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""} · ${EST[c.st]}</small></span><button class="addb" data-rtog="${c.id}" aria-pressed="${on}">${on?(cur().v==="rapEd"?"✓ Añadido":"✓ En la ruta"):"+ Añadir"}</button></li>`; }
 function rresHtml(){
   if(rmode==="buscar"){
@@ -674,19 +761,53 @@ const rapKms = r => { const a=kmNum(r.kmIni??""), b=kmNum(r.kmFin??""); return (
 const kmTotTxt = () => { const a=kmNum(rap.kmIni??""), b=kmNum(rap.kmFin??""); if(a===""||b==="") return ""; if(b<a) return "⚠️ Los de llegada son menos que los de salida. Revísalos."; return ""; };
 const kmTotUpd = () => { const t=$("rp-kmt"); if(t) t.innerHTML=kmTotTxt(); };
 const addLine = c => rap.lineas.push({cid:c.id, n:c.n, p:title(c.p), m:"Visita comercial"});
+/* rapports guardados por carpetas: mes → semana (de lunes a domingo) → día */
+const lunes = f => { const d=new Date(f+"T12:00"); d.setDate(d.getDate()-((d.getDay()+6)%7)); return d.toLocaleDateString("sv-SE"); };
+const sumaDias = (f,n) => { const d=new Date(f+"T12:00"); d.setDate(d.getDate()+n); return d.toLocaleDateString("sv-SE"); };
+const mesTxt = ym => { const t=new Date(ym+"-15T12:00").toLocaleDateString("es-ES",{month:"long",year:"numeric"}).replace(" de "," "); return t[0].toUpperCase()+t.slice(1); };
+const diaMes = f => new Date(f+"T12:00").toLocaleDateString("es-ES",{day:"numeric",month:"long"});
+const rapsOrd = () => [...(DB.rapports||[])].sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.cr||"").localeCompare(a.cr||""));
+const kmTag = rs => rs.some(faltaKm) ? ` · <b style="color:var(--orange-fg)">faltan km</b>` : "";
+function rapBtn(r){ return `<button class="big sm" data-rap="${r.id}"><span><span class="bn">${esc(diaLabel(r.fecha))}</span><span class="bs">${fmtShort(r.fecha)} · ${r.lineas.length} cliente${r.lineas.length===1?"":"s"}${faltaKm(r)?` · <b style="color:var(--orange-fg)">faltan los km</b>`:""}</span></span><span class="bc">${r.lineas.length}</span></button>`; }
 V.rapport = () => {
-  const rs=[...(DB.rapports||[])].sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.cr||"").localeCompare(a.cr||""));
-  let h=`<button class="btn pri" data-newrap>${ICON.plus}Nuevo rapport</button>`;
-  if(rs.length) h+=`<div class="grid">`+rs.map(r=>{ const km="";
-    return `<button class="big sm" data-rap="${r.id}"><span><span class="bn">${esc(diaLabel(r.fecha))}</span><span class="bs">${fmtShort(r.fecha)}${km}</span></span><span class="bc">${r.lineas.length}</span></button>`; }).join("")+`</div>`;
-  return {t:"Rapport", s:"Visitas del día para la empresa", h};
+  const rs=rapsOrd(), hayHoy=rs.some(r=>r.fecha===today());
+  let h=cierreBanner()+`<button class="btn pri" data-newrap>${hayHoy?ICON.doc+"Abrir el rapport de hoy":ICON.plus+"Nuevo rapport"}</button>`;
+  const meses=[...new Set(rs.map(r=>r.fecha.slice(0,7)))];
+  if(meses.length){ h+=`<h2 class="sec">Rapports guardados</h2><div class="grid">`+meses.map(ym=>{ const m=rs.filter(r=>r.fecha.startsWith(ym)), ns=new Set(m.map(r=>lunes(r.fecha))).size;
+      return `<button class="big" data-rmes="${ym}"${ym===today().slice(0,7)?' style="border-color:var(--brand)"':""}><span><span class="bn">${mesTxt(ym)}</span><span class="bs">${m.length} rapport${m.length===1?"":"s"} · ${ns} semana${ns===1?"":"s"}${kmTag(m)}</span></span><span class="bc">${m.length}</span></button>`; }).join("")+`</div>`; }
+  else h+=`<p class="empty">Todavía no hay rapports guardados.</p>`;
+  return {t:"Rapport", s:"Ordenados por meses y semanas", h};
 };
+V.rapMes = ({ym}) => {
+  const rs=rapsOrd().filter(r=>r.fecha.startsWith(ym)), ws=[...new Set(rs.map(r=>lunes(r.fecha)))];
+  const h=`<div class="grid">`+ws.map(w=>{ const x=rs.filter(r=>lunes(r.fecha)===w), dom=sumaDias(w,6), esta=w===lunes(today());
+    return `<button class="big" data-rsem="${ym}|${w}"${esta?' style="border-color:var(--brand)"':""}><span><span class="bn">Semana del ${w.slice(0,7)===ym?new Date(w+"T12:00").getDate():diaMes(w)}${esta?" (esta semana)":""}</span><span class="bs">Del ${diaMes(w)} al ${diaMes(dom)} · ${x.length} rapport${x.length===1?"":"s"}${kmTag(x)}</span></span><span class="bc">${x.length}</span></button>`; }).join("")+`</div>`;
+  return {t:mesTxt(ym), s:`${rs.length} rapport${rs.length===1?"":"s"} · ${ws.length} semana${ws.length===1?"":"s"}`, h: rs.length?h:`<p class="empty">No hay rapports este mes.</p>`};
+};
+V.rapSem = ({ym,w}) => {
+  const rs=rapsOrd().filter(r=>r.fecha.startsWith(ym) && lunes(r.fecha)===w);
+  return {t:"Semana del "+new Date(w+"T12:00").getDate()+" de "+new Date(w+"T12:00").toLocaleDateString("es-ES",{month:"long"}), s:`Del ${diaMes(w)} al ${diaMes(sumaDias(w,6))}`, h: rs.length?`<div class="grid">${rs.map(rapBtn).join("")}</div>`:`<p class="empty">No hay rapports esta semana.</p>`};
+};
+
+/* última vez que se estuvo en el cliente antes del día de este rapport (otros rapports o «He estado hoy») */
+function visitaAnterior(cid){
+  const f=rap?rap.fecha:today(); let best="";
+  (DB.rapports||[]).forEach(r=>{ if(rap && rap.id && r.id===rap.id) return; if(r.fecha<f && r.fecha>best && (r.lineas||[]).some(l=>l.cid===cid)) best=r.fecha; });
+  const c=byId(cid); (c&&c.notes||[]).forEach(n=>{ if(n.t==="Visita" && n.d && n.d<f && n.d>best) best=n.d; });
+  return best;
+}
+function ultVisBox(cid){
+  const v=visitaAnterior(cid);
+  if(!v) return `<span class="uv">Primera visita</span>`;
+  const d=daysAgo(v);
+  return `<span class="uv${d<RAP_RECIENTE?" warn":""}">Última visita: <b>${fmtShort(v)}</b> · ${agoTxt(v)}</span>`;
+}
 function rapLinesHtml(){
   const ls=rap.lineas;
   if(!ls.length) return `<p class="hint">Añade abajo los clientes que has visitado.</p>`;
   return `<ol class="rlist">${ls.map((l,i)=>`<li class="rrow rapl"><span class="stop">${i+1}</span><span class="rn">
     ${l.cid?`<b>${esc(l.n)}</b><small>${esc(l.p)}</small>`:`<input type="text" class="rin" data-lf="n" data-li="${i}" value="${esc(l.n)}" placeholder="Cliente" aria-label="Cliente"><input type="text" class="rin" data-lf="p" data-li="${i}" value="${esc(l.p)}" placeholder="Población" aria-label="Población">`}
-    <input type="text" class="rin" list="motl" data-lf="m" data-li="${i}" value="${esc(l.m)}" placeholder="Motivo de la visita / observaciones" aria-label="Motivo de la visita de ${esc(l.n)}"></span>
+    <input type="text" class="rin" list="motl" data-lf="m" data-li="${i}" value="${esc(l.m)}" placeholder="Motivo de la visita / observaciones" aria-label="Motivo de la visita de ${esc(l.n)}">${l.cid?ultVisBox(l.cid):""}</span>
     <span class="rctl"><button class="ib" data-lup="${i}" aria-label="Subir"${i?"":" disabled"}>${ICON.up}</button><button class="ib" data-ldown="${i}" aria-label="Bajar"${i<ls.length-1?"":" disabled"}>${ICON.down}</button><button class="ib x" data-ldel="${i}" aria-label="Quitar ${esc(l.n)}">${ICON.x}</button></span></li>`).join("")}</ol>`;
 }
 function quickAdds(){ const f=rap.fecha, have=new Set(selIds());
@@ -711,8 +832,9 @@ V.rapEd = () => {
   ${raddHtml()}
   <h2 class="sec">Kilómetros</h2>
   <section class="box"><div style="display:flex;flex-direction:column;gap:16px"><label class="lbl">Kilómetros de salida<input type="text" inputmode="numeric" id="rp-kmi" value="${esc(rap.kmIni)}" placeholder="Por ejemplo: 31290" autocomplete="off"></label><label class="lbl">Kilómetros de llegada<input type="text" inputmode="numeric" id="rp-kmf" value="${esc(rap.kmFin)}" placeholder="Por ejemplo: 31420" autocomplete="off"></label><p class="hint" id="rp-kmt" style="font-size:1.1rem">${kmTotTxt()}</p></div></section>
-  <div class="savebar"><button class="btn pri" data-rappdf>${ICON.doc}Guardar y descargar PDF</button></div>
-  <button class="btn" data-rapsave>Guardar sin descargar</button>
+  <div class="savebar"><button class="btn pri" data-rapprint>${ICON.print}Imprimir</button></div>
+  <button class="btn" data-rapsave>Guardar sin imprimir</button>
+  <button class="btn quiet" data-rappdf>Descargar en PDF</button>
   ${!rap.id?"":ui.delRap?`<div class="confirm"><strong>¿Borrar este rapport?</strong><div class="row2"><button class="btn" data-delrapno>Cancelar</button><button class="btn pri" data-delrapyes>Sí, borrar</button></div></div>`:`<button class="btn danger" data-delrap>${ICON.trash}Borrar rapport</button>`}`;
   return {t:"Rapport · "+fmtShort(rap.fecha), s:"Clientes, motivo y kilómetros", h: h + `<div id="rqa" style="display:flex;flex-direction:column;gap:10px;margin-top:28px">${quickAdds()}</div>`};
 };
@@ -760,6 +882,24 @@ const kI=kmNum(r.kmIni??""), kF=kmNum(r.kmFin??"");
 y+=12; if(y+8>290){ doc.addPage(); y=top; } doc.setLineWidth(.3); doc.rect(100, y, R-100, 8); txt(`KILOMETROS: ${kF}`, 102, y+6, 13);
 return doc.output("arraybuffer");
 }
+/* imprimir: la misma hoja A4 que el PDF, hecha con HTML y el diálogo de impresión del móvil o del ordenador */
+function rapHojaHtml(r){
+  const P=perfil(), kI=kmNum(r.kmIni??""), kF=kmNum(r.kmFin??""), filas=[...r.lineas];
+  while(filas.length<13) filas.push({n:"",p:"",m:""});
+  return `<div class="ph"><div class="ph1"><b class="pt">RAPPORT visitas</b><span class="pn">${esc(String(P.nombre).toUpperCase())}</span></div>
+    <div class="ph2"><span>MATRICULA: ${esc(P.matricula)}</span><span class="pd">${fmtYY(r.fecha)}</span></div>
+    <div class="pk">KILOMETRO&nbsp;&nbsp;${kI}</div></div>
+    <table class="ptab"><thead><tr><th>CLIENTE</th><th>POBLACION</th><th>MOTIVO DE LA VISITA / OBSERVACIONES</th></tr></thead>
+    <tbody>${filas.map(l=>`<tr><td>${esc(l.n)}</td><td>${esc(l.p)}</td><td>${esc(l.m)}</td></tr>`).join("")}</tbody></table>
+    <div class="pk pk2">KILOMETROS: ${kF}</div>`;
+}
+function rapPrint(){
+  const r=rapSave(); if(!r) return; render();
+  if(window.claude){ return toast("En la versión de prueba no se puede imprimir. En la app de verdad se abrirá la impresora.", 6000); }
+  let pa=$("printarea"); if(!pa){ pa=document.createElement("div"); pa.id="printarea"; document.body.appendChild(pa); }
+  pa.innerHTML=rapHojaHtml(r);
+  setTimeout(()=>{ try{ window.print(); }catch(e){ toast("Este aparato no deja imprimir. Usa «Descargar en PDF»."); } },100);
+}
 async function rapDownload(){
   const r=rapSave(); if(!r) return;
   render(); toast("Preparando el PDF…");
@@ -787,11 +927,12 @@ V.avisos = () => {
         <button class="act" data-editnote="${c.id}|${n.id}">${ICON.pen}Editar</button>
         <button class="act done" data-ndone="${c.id}|${n.id}">${ICON.check}Hecho</button>
       </div></article>`; };
-  let h=`<div class="sumrow"><div class="sum hot"><b>${hoy.length}</b><span>Hoy o atrasados</span></div><div class="sum"><b>${prox.length}</b><span>Próximos días</span></div><div class="sum"><b>${sin.length}</b><span>Sin fecha</span></div></div>`;
-  { const nv=revisitList().length; h+=`<button class="big" data-volver style="margin-top:14px${nv?";border-color:var(--orange)":""}"><span><span class="bn">Visitas mensuales pendientes</span><span class="bs">${nv?`${nv} cliente${nv>1?"s":""} a los que toca volver`:"Ahora mismo ninguna"}</span></span><span class="bc">${nv}</span></button>`; }
+  let h=cierreBanner()+`<div class="sumrow"><div class="sum hot"><b>${hoy.length}</b><span>Hoy o atrasados</span></div><div class="sum"><b>${prox.length}</b><span>Próximos días</span></div><div class="sum"><b>${sin.length}</b><span>Sin fecha</span></div></div>`;
+  h+="<!--RV-->";
 h+=`<h2 class="sec">Para hoy</h2><p class="ord">Primero lo más atrasado</p>`+(hoy.length?hoy.map(item).join(""):`<p class="empty">Nada para hoy.</p>`);
   const rv=revisitList();
-const rvItem=({c,lv})=>{ const tel=telHref(c.t), nd=daysSince(lv); return `<article class="card"><div class="av-top"><span class="tag av due">Toca visitarlo</span><small>Última visita: ${fmtShort(lv)}</small></div><button class="cmain" data-open="${c.id}" style="padding-top:8px"><span class="cname">${esc(c.n)}</span><span class="cinfo">${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""}</span></button><p class="anote">Hace ${nd} días que no vas. Ya toca volver.</p><div class="acts" style="margin-top:12px">${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}<button class="act" data-open="${c.id}">${ICON.doc}Ficha</button><button class="act done" data-visitc="${c.id}">${ICON.check}He estado hoy</button></div></article>`; };
+const rvItem=({c,lv})=>{ const tel=telHref(c.t), nd=daysSince(lv); return `<article class="card"><div class="av-top"><span class="tag av due">${nd>=60?"Hace más de "+Math.floor(nd/30)+" meses":"Hace más de un mes"}</span><small>Última visita: ${fmtShort(lv)}</small></div><button class="cmain" data-open="${c.id}" style="padding-top:8px"><span class="cname">${esc(c.n)}</span><span class="cinfo">${esc(title(c.p))}${c.r?` · ${esc(c.r)}`:""}</span></button><p class="anote">Hace ${nd} días que no visitas a <b>${esc(c.n)}</b>. Ya toca volver.</p><div class="acts" style="margin-top:12px">${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}<button class="act" data-open="${c.id}">${ICON.doc}Ficha</button><button class="act done" data-visitc="${c.id}">${ICON.check}He estado hoy</button></div></article>`; };
+  h=h.replace("<!--RV-->", rv.length ? `<h2 class="sec">Más de un mes sin visitar</h2><p class="banner" style="margin:0">Hace más de un mes que no visitas a ${rv.length===1?"este cliente":"estos "+rv.length+" clientes"}. Primero el que más tiempo lleva.</p>`+rv.map(rvItem).join("") : "");
 h+=`<h2 class="sec">Próximos días</h2><p class="ord">Primero lo más cercano</p>`+(prox.length?prox.map(item).join(""):`<p class="empty">No hay avisos programados. Añade una nota desde la ficha de cada cliente.</p>`);
   h+=`<h2 class="sec">Notas sin fecha</h2><p class="ord">Primero la más nueva</p>`+(sin.length?sin.map(item).join(""):`<p class="empty">No hay notas sueltas.</p>`);
   return {t:"Avisos", s:`${hoy.length} para hoy · ${rv.length} por visitar · ${prox.length} próximos · ${sin.length} sin fecha`, h};
@@ -819,9 +960,8 @@ V.ficha = ({id}) => {
     ${c.e?`<div class="mail"><span>${esc(c.e)}</span><button class="copy" data-copy="${esc(c.e)}">Copiar</button></div>`:""}
   </section>
   <h2 class="sec">Compras</h2>${compras(c)}
-  <h2 class="sec">Estado</h2>
-  <div class="states">${ORDER.map(s=>`<button class="sbtn st-${s}" data-st="${s}" aria-pressed="${c.st===s}">${EST[s]}</button>`).join("")}</div>
-  <button class="btn pri" data-visit>${ICON.check}He estado hoy</button>
+  <h2 class="sec">Visita</h2>
+  ${(c.notes||[]).some(n=>n.d===today()&&n.t==="Visita")?`<button class="btn big-vis on" data-visit>${ICON.check}Visitado hoy</button>`:`<button class="btn pri big-vis" data-visit>${ICON.check}He estado hoy</button>`}
 ${(()=>{ const lv=lastVisit(c); return lv?`<p class="hint" style="font-size:1.1rem;text-align:center;margin:10px 0 0">Última visita: <b>${fmtShort(lv)}</b> (${haceTxt(daysSince(lv))})</p>`:`<p class="hint" style="font-size:1.05rem;text-align:center;margin:10px 0 0">Todavía no hay ninguna visita apuntada.</p>`; })()}
   <h2 class="sec">Notas y avisos</h2>
   <section class="box">
@@ -948,10 +1088,85 @@ $("sheet").onclick=e=>{
 };
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && sheet){ micKill(); sheet=null; renderSheet(); } });
 
-V.form = ({id}) => {
-  const c=id?byId(id):{n:"",r:"",t:"",e:"",p:"",z:"",c:""};
+/* ---------- posibles clientes cerca (GPS + OpenStreetMap; la ubicación no se guarda ni se envía a Interlama) ---------- */
+let cerca={st:"", lat:null, lon:null, radio:10, items:[], yaCli:0, msg:"", demo:false};
+const RADIOS=[5,10,20];
+function hav(a,b,c,d){ const r=Math.PI/180, x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2; return 6371*2*Math.asin(Math.sqrt(x)); }
+function puebloCerca(lat,lon){ let best="", bd=1e9; Object.keys(GEO).forEach(p=>{ const g=GEO[p], dd=hav(lat,lon,g[0],g[1]); if(dd<bd){ bd=dd; best=p; } }); return bd<8?best:""; }
+const limpiaNom = n => norm(n).replace(/\b(s\.?l\.?u?|s\.?a\.?|s\.?c\.?p?)\b/g,"").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+function esCliente(nom){ const a=limpiaNom(nom); if(a.length<4) return false; return DB.clients.some(c=>{ const b=limpiaNom(c.n); return b.length>=4 && (a===b || a.includes(b) || b.includes(a)); }); }
+function tipoNeg(t){ const n=norm(t.name||""); if(/persian/.test(n)) return "Persianas"; if(/toldo/.test(n)) return "Toldos"; if(/serralleri|cerrajer/.test(n)||t.craft==="metal_construction") return "Cerrajería / metal"; if(/vidr|cristal/.test(n)||t.craft==="glaziery") return "Cristalería"; if(/alumin/.test(n)||t.craft==="window_construction") return "Carpintería de aluminio"; if(t.craft==="carpenter"||t.craft==="joiner"||/fusteri|carpinter/.test(n)) return "Carpintería"; return "Ventanas y puertas"; }
+async function buscarOSM(lat,lon,km){
+  const R=Math.round(km*1000), A=`(around:${R},${lat},${lon})`, N='"alumin|persian|tancament|toldo|serralleri|cerrajer|fusteria met|carpinteria met|ventana|finestr"';
+  const q=`[out:json][timeout:25];(nwr${A}["craft"~"metal_construction|window_construction|glaziery"];nwr${A}["name"~${N},i];nwr${A}["craft"~"carpenter|joiner"]["name"~"alumin|met",i];);out center tags 120;`;
+  const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"}});
+  if(!r.ok) throw new Error("osm "+r.status);
+  return (await r.json()).elements||[];
+}
+function prepara(els,lat,lon){
+  const seen=new Set(), out=[]; let ya=0;
+  els.forEach(e=>{ const t=e.tags||{}, la=e.lat??e.center?.lat, lo=e.lon??e.center?.lon; if(!t.name||la==null) return;
+    if(/bank|restaurant|cafe|bar|fuel|school/.test(t.amenity||"")) return;
+    const k=limpiaNom(t.name); if(seen.has(k)) return; seen.add(k);
+    if(esCliente(t.name)){ ya++; return; }
+    const pc=puebloCerca(la,lo);
+    out.push({n:t.name, tipo:tipoNeg(t), lat:la, lon:lo, d:hav(lat,lon,la,lo), tel:String(t.phone||t["contact:phone"]||"").split(/[;,]/)[0].replace(/^\s*(\+|00)\s*34[\s-]*/,"").trim(), web:t.website||t["contact:website"]||"",
+      p: pc || String(t["addr:city"]||"").toUpperCase(), calle:[t["addr:street"],t["addr:housenumber"]].filter(Boolean).join(" ")}); });
+  out.sort((a,b)=>a.d-b.d); return {items:out, ya};
+}
+async function cercaBuscar(demo){
+  cerca.st="gps"; cerca.msg=""; cerca.demo=!!demo; render();
+  try{
+    if(demo){ cerca.lat=window.__demoCerca.lat; cerca.lon=window.__demoCerca.lon; }
+    else{
+      if(!navigator.geolocation) throw {msg:"Este móvil no permite saber la ubicación."};
+      const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:false,timeout:15000,maximumAge:120000}));
+      cerca.lat=pos.coords.latitude; cerca.lon=pos.coords.longitude;
+    }
+    cerca.st="busca"; render();
+    const els = demo ? window.__demoCerca.els : await buscarOSM(cerca.lat,cerca.lon,cerca.radio);
+    const r=prepara(els,cerca.lat,cerca.lon); cerca.items=r.items.filter(x=>x.d<=cerca.radio+0.5); cerca.yaCli=r.ya; cerca.st="ok";
+  }catch(e){
+    cerca.st="err";
+    cerca.msg = e&&e.msg ? e.msg : (e&&e.code===1) ? "No hay permiso para usar la ubicación. Actívalo en los ajustes del navegador para esta página y vuelve a probar."
+      : (e&&(e.code===2||e.code===3)) ? "No se ha podido saber dónde estás. Prueba otra vez en un momento, mejor al aire libre."
+      : "No se ha podido hacer la búsqueda. Revisa la conexión y prueba otra vez.";
+    console.warn("cerca",e);
+  }
+  render();
+}
+V.cerca = () => {
+  const aqui=cerca.lat!=null?puebloCerca(cerca.lat,cerca.lon):"";
+  let h=`<p class="hint">Busca carpinterías de aluminio, persianas, toldos y cerrajerías a tu alrededor que <b>todavía no son clientes tuyos</b>.</p>
+  <div class="chips" role="group" aria-label="Distancia">${RADIOS.map(r=>`<button class="chip" data-radio="${r}" aria-pressed="${cerca.radio===r}">A ${r} km</button>`).join("")}</div>
+  <button class="btn pri big-vis" data-cbuscar>${ICON.pin}${cerca.st==="ok"?"Buscar otra vez":"Buscar a mi alrededor"}</button>`;
+  if(cerca.st==="gps") h+=`<p class="empty"><span class="spin"></span>Mirando dónde estás…</p>`;
+  if(cerca.st==="busca") h+=`<p class="empty"><span class="spin"></span>Buscando negocios cerca${aqui?" de "+esc(title(aqui)):""}…</p>`;
+  if(cerca.st==="err") h+=`<p class="banner">${esc(cerca.msg)}</p>${window.__demoCerca?`<button class="btn" data-cdemo>Probar con una ubicación de ejemplo (Granollers)</button>`:""}`;
+  if(cerca.st==="ok"){
+    const maps=`https://www.google.com/maps/search/carpinter%C3%ADa+de+aluminio/@${cerca.lat},${cerca.lon},13z`;
+    h+=`<h2 class="sec">${cerca.items.length} posible${cerca.items.length===1?"":"s"} cliente${cerca.items.length===1?"":"s"}${aqui?" cerca de "+esc(title(aqui)):""}</h2>
+    <p class="ord">Primero el más cercano${cerca.yaCli?` · ${cerca.yaCli} ya son clientes tuyos y no salen`:""}${cerca.demo?" · ubicación de ejemplo":""}</p>`;
+    h+= cerca.items.length ? cerca.items.slice(0,40).map((x,i)=>{ const tel=telHref(x.tel), dir=`https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lon}`;
+      return `<article class="card"><div class="cmain" style="cursor:default"><span class="cname">${esc(x.n)}</span>
+        <span class="cinfo">${esc(x.tipo)} · ${x.p?esc(title(x.p))+" · ":""}a ${x.d<1?"menos de 1":x.d.toFixed(1).replace(".",",")} km</span>
+        ${x.calle?`<span class="cinfo">${esc(x.calle)}</span>`:""}${x.tel?`<span class="cinfo"><b>${esc(x.tel)}</b></span>`:`<span class="cinfo">Sin teléfono en el mapa</span>`}</div>
+        <div class="acts">
+          ${tel?`<a class="act call" href="${tel}" target="_top">${ICON.phone}Llamar</a>`:`<span class="act" aria-disabled="true">${ICON.phone}Sin teléfono</span>`}
+          <a class="act" href="${dir}" target="_blank" rel="noopener">${ICON.pin}Cómo llegar</a>
+          <button class="act vis" data-cadd="${i}">${ICON.plus}Añadir cliente</button>
+        </div></article>`; }).join("")
+      : `<p class="empty">No he encontrado negocios nuevos en el mapa a ${cerca.radio} km. Prueba con más distancia o mira en Google Maps.</p>`;
+    h+=`<a class="btn" href="${maps}" target="_blank" rel="noopener">${ICON.pin}Ver más en Google Maps</a>
+    <p class="hint" style="font-size:.9rem">Los datos salen de OpenStreetMap, que no tiene todos los negocios. Google Maps suele tener más.</p>`;
+  }
+  return {t:"Posibles clientes", s:aqui?"Cerca de "+title(aqui):"Negocios del sector a tu alrededor", h};
+};
+
+V.form = ({id,pre}) => {
+  const c=id?byId(id):Object.assign({n:"",r:"",t:"",e:"",p:"",z:"",c:""},pre||{});
   const pueblos=[...new Set(DB.clients.map(x=>x.p))].sort((a,b)=>a.localeCompare(b,"es"));
-  const h=`<section class="box">
+  const h=(id?"":fotoBox())+`<section class="box">
     <label class="lbl">Nombre del cliente *<input type="text" id="f-n" value="${esc(c.n)}" autocomplete="off"></label>
     <p class="err" id="f-err" hidden>Escribe el nombre del cliente.</p>
     <label class="lbl">Persona de contacto <small>o razón social</small><input type="text" id="f-r" value="${esc(c.r)}" autocomplete="off"></label>
@@ -976,10 +1191,11 @@ V.ajustes = () => {
 function backupBox(){
   const last = DB.lastExport ? `Última copia: ${fmtShort(DB.lastExport)}` : "Todavía no has hecho ninguna copia.";
   let h=`<h2 class="sec">Copia de seguridad</h2><section class="box">
-    <p class="hint">Además de la nube, puedes descargar un Excel como copia extra. ${last}</p>
-    <button class="btn pri" data-export>Descargar Excel</button>
+    <p class="hint">El Excel se hace <b>en el momento</b> con los ${DB.clients.length} clientes que hay ahora en la app: los que has eliminado no salen y los cambios ya están dentro. ${last}</p>
+    <p class="hint" style="font-size:.95rem">Un Excel que ya descargaste antes no cambia solo. Usa siempre el último y borra los antiguos.</p>
+    <button class="btn pri" data-export>Descargar Excel actualizado</button>
     <button class="btn" data-import>Recuperar desde un Excel</button>`;
-  if(ui.imp) h+=`<div class="confirm"><strong>¿Cargar ${ui.imp.length} clientes de ${esc(ui.impName)}?</strong><span>Sustituirán a los que tienes ahora en la app.</span><div class="row2"><button class="btn" data-impno>Cancelar</button><button class="btn pri" data-impyes>Sí, cargar</button></div></div>`;
+  if(ui.imp) h+=`<div class="confirm"><strong>¿Cargar ${ui.imp.length} clientes de ${esc(ui.impName)}?</strong><span>Sustituirán a los ${DB.clients.length} que tienes ahora en la app.${ui.impFecha?` Este Excel es del <b>${esc(ui.impFecha)}</b>: los clientes que hayas eliminado después volverán a aparecer y se perderá lo que hayas cambiado desde entonces.`:" Los clientes que hayas eliminado después de hacer ese Excel volverán a aparecer."}</span><div class="row2"><button class="btn" data-impno>Cancelar</button><button class="btn pri" data-impyes>Sí, cargar</button></div></div>`;
   return h+`</section>`;
 }
 
@@ -996,6 +1212,9 @@ function render(reset){
   document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-current", b.dataset.tab===tab));
   const due=session&&READY?dueCount():0;
   $("badge").hidden=!due; $("badge").textContent=due;
+  { const rb=$("rbadge"); if(rb) rb.hidden=!(session&&READY&&cierrePend()); }
+  if(view.v==="rapEd" && ui.kmFocus && rap){ ui.kmFocus=false; const el=$(kmNum(rap.kmIni)===""?"rp-kmi":"rp-kmf");
+    if(el) setTimeout(()=>{ el.scrollIntoView({block:"center"}); el.focus(); el.classList.add("ai"); },60); }
   renderSheet();
   if(reset) window.scrollTo(0,0); else window.scrollTo(0,y);
   if(view.v==="login") bindLogin();
@@ -1023,19 +1242,34 @@ $("v").onclick=async e=>{
   const d=b.dataset, view=cur(), c=view.id?byId(view.id):null;
   if(d.tab) return setTab(d.tab);
   if(d.zona) return go({v:"pueblos",z:d.zona});
+  if(b.hasAttribute("data-cerca")) return go({v:"cerca"});
+  if(d.rmes) return go({v:"rapMes", ym:d.rmes});
+  if(d.rsem){ const [ym,w]=d.rsem.split("|"); return go({v:"rapSem", ym, w}); }
+  if(b.hasAttribute("data-cierre")){ const r=rapHoy(); if(!r) return; rap=JSON.parse(JSON.stringify(r)); rap.kmIni=r.kmIni!=null?String(r.kmIni):""; rap.kmFin=r.kmFin!=null?String(r.kmFin):""; delete rap.km; rq="";
+    tab="rapport"; stack=[{v:"rapport"}]; go({v:"rapEd"}); ui.kmFocus=true; return render(true); }
+  if(d.radio){ cerca.radio=+d.radio; return render(); }
+  if(b.hasAttribute("data-cbuscar")) return cercaBuscar(false);
+  if(b.hasAttribute("data-cdemo")) return cercaBuscar(true);
+  if(d.cadd!==undefined){ const x=cerca.items[+d.cadd]; if(!x) return; const pm=matchPueblo(x.p||"");
+    return go({v:"form", id:null, pre:{n:x.n, t:x.tel, p:pm||x.p||"", z:pm?(PZ[pm]||""):""}}); }
   if(b.hasAttribute("data-newruta")){ draft={id:null, nombre:"", fecha:today(), ids:[]}; rq=""; rpueblo=""; return go({v:"rutaEd"}); }
   if(d.ruta) return go({v:"ruta",rid:d.ruta});
   if(d.editruta){ const r=rutaById(d.editruta); if(!r) return; draft=JSON.parse(JSON.stringify(r)); rq=""; return go({v:"rutaEd"}); }
   if(b.hasAttribute("data-delruta")){ ui.delRuta=true; return render(); }
   if(b.hasAttribute("data-delrutano")){ ui.delRuta=false; return render(); }
   if(b.hasAttribute("data-delrutayes")){ DB.rutas=DB.rutas.filter(r=>r.id!==view.rid); markDirty("rutas"); save(); stack=[{v:"zonas"}]; ui={}; render(true); return toast("Ruta borrada"); }
-  if(b.hasAttribute("data-newrap")){ const f=today(); const last=(DB.rapports||[]).slice().sort((x,y)=>(y.fecha||"").localeCompare(x.fecha||"")||(y.cr||"").localeCompare(x.cr||""))[0]; rap={id:null, fecha:f, kmIni:last?rapKm(last):"", kmFin:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
+  if(b.hasAttribute("data-newrap")){ const f=today();
+    /* si ya hay rapport de hoy (por ejemplo, creado con «He estado hoy»), se abre ese en vez de empezar uno vacío */
+    const hoy=(DB.rapports||[]).filter(x=>x.fecha===f).sort((x,y)=>(y.cr||"").localeCompare(x.cr||""))[0];
+    if(hoy){ rap=JSON.parse(JSON.stringify(hoy)); rap.kmIni=hoy.kmIni!=null?String(hoy.kmIni):""; rap.kmFin=hoy.kmFin!=null?String(hoy.kmFin):""; delete rap.km; rq=""; return go({v:"rapEd"}); } const last=(DB.rapports||[]).slice().sort((x,y)=>(y.fecha||"").localeCompare(x.fecha||"")||(y.cr||"").localeCompare(x.cr||""))[0]; rap={id:null, fecha:f, kmIni:last?rapKm(last):"", kmFin:"", lineas:[]}; rq=""; rpueblo=""; return go({v:"rapEd"}); }
   if(d.rap){ const r=(DB.rapports||[]).find(x=>x.id===d.rap); if(!r) return; rap=JSON.parse(JSON.stringify(r)); rap.kmIni=r.kmIni!=null?String(r.kmIni):""; rap.kmFin=r.kmFin!=null?String(r.kmFin):(r.kmIni==null&&r.km!=null?String(r.km):""); delete rap.km; rq=""; return go({v:"rapEd"}); }
   if(rap && view.v==="rapEd"){
     if(d.rmode){ rmode=d.rmode; return render(); }
     if(d.rz){ rzona = rzona===d.rz ? "" : d.rz; rpueblo=""; return render(); }
     if(d.rp){ rpueblo = rpueblo===d.rp ? "" : d.rp; return render(); }
-    if(d.rtog){ const i=rap.lineas.findIndex(l=>l.cid===d.rtog), c=byId(d.rtog); if(i>=0) rap.lineas.splice(i,1); else if(c) addLine(c); refreshRuta(); return toast(i>=0?"Quitado del rapport":"Añadido al rapport"); }
+    if(d.rtog){ const i=rap.lineas.findIndex(l=>l.cid===d.rtog), c=byId(d.rtog); if(i>=0) rap.lineas.splice(i,1); else if(c) addLine(c); refreshRuta();
+      if(i>=0) return toast("Quitado del rapport");
+      const lr=lastRap(d.rtog); return toast(lr?`Añadido al rapport · última vez: ${fmtShort(lr)} (${agoTxt(lr)})`:"Añadido al rapport · es la primera vez", 8000); }
     if(b.hasAttribute("data-rall")){ const have=selIds(), add=DB.clients.filter(c=>c.z===rzona && c.p===rpueblo && !have.includes(c.id)).sort(sortN); add.forEach(addLine); refreshRuta(); return toast(add.length+" añadidos al rapport"); }
     if(b.hasAttribute("data-rfree")){ const t=rq.trim(); if(!t) return; rap.lineas.push({cid:null, n:t, p:"", m:"Visita comercial"}); rq=""; render(); return toast("Añadido. Escribe la población"); }
     if(b.hasAttribute("data-qvis")){ const have=selIds(); DB.clients.filter(c=>!have.includes(c.id) && c.notes.some(n=>n.d===rap.fecha && n.t==="Visita")).forEach(addLine); refreshRuta(); return toast("Añadidos"); }
@@ -1046,6 +1280,7 @@ $("v").onclick=async e=>{
     if(b.hasAttribute("data-perfilok")){ DB.perfil={nombre:$("pf-n").value.trim()||PERFIL0.nombre, matricula:$("pf-m").value.trim()}; markDirty("perfil"); save(); ui.perfil=false; render(); return toast("Guardado"); }
     if(b.hasAttribute("data-rapsave")){ if(rapSave()){ render(); toast("Rapport guardado"); } return; }
     if(b.hasAttribute("data-rappdf")) return rapDownload();
+    if(b.hasAttribute("data-rapprint")) return rapPrint();
     if(b.hasAttribute("data-delrap")){ ui.delRap=true; return render(); }
     if(b.hasAttribute("data-delrapno")){ ui.delRap=false; return render(); }
     if(b.hasAttribute("data-delrapyes")){ DB.rapports=(DB.rapports||[]).filter(r=>r.id!==rap.id); markDirty("rapports"); save(); rap=null; tab="rapport"; stack=[{v:"rapport"}]; ui={}; render(true); return toast("Rapport borrado"); }
@@ -1074,8 +1309,8 @@ $("v").onclick=async e=>{
   if(d.copy!==undefined){ try{ await navigator.clipboard.writeText(d.copy); toast("Copiado"); }catch(err){ toast("Mantén el dedo encima para copiar"); } return; }
   if(d.st && c){ c.st=d.st; if(d.st==="vis" && !(c.notes||[]).some(n=>n.d===today()&&n.t==="Visita")){ c.notes=c.notes||[]; c.notes.push(newNote("Visita","",false)); } save(); render(); return toast("Estado: "+EST[d.st]); }
   if(b.hasAttribute("data-volver")) return go({v:"volver"});
-if(d.visitc){ const cc=byId(d.visitc); if(cc){ cc.notes=cc.notes||[]; if(!cc.notes.some(n=>n.d===today()&&n.t==="Visita")) cc.notes.push(newNote("Visita","",false)); if(cc.st==="pend") cc.st="vis"; save(); render(); toast("Apuntado: hoy has estado en "+cc.n); } return; }
-if(b.hasAttribute("data-visit") && c){ c.notes=c.notes||[]; if(c.notes.some(n=>n.d===today()&&n.t==="Visita")){ if(c.st==="pend") c.st="vis"; save(); render(); return toast("Ya estaba apuntado que has estado hoy"); } c.notes.push(newNote("Visita","",false)); if(c.st==="pend") c.st="vis"; save(); render(); return toast("Visita de hoy apuntada"); }
+if(d.visitc){ const x=byId(d.visitc); if(x) marcarVisita(x); return; }
+  if(b.hasAttribute("data-visit") && c) return marcarVisita(c);
   if(d.addnote){ sheet={type:"note", id:d.addnote, when:"7", txt:""}; return renderSheet(); }
   if(d.editnote){ const [cid,nid]=d.editnote.split("|"), x=byId(cid), n=x&&x.notes.find(y=>y.id===nid); if(!n) return;
     sheet={type:"note", id:cid, nid, txt:n.t, when:n.av?"x":"no", date:n.av||""}; return renderSheet(); }
@@ -1101,13 +1336,101 @@ if(b.hasAttribute("data-visit") && c){ c.notes=c.notes||[]; if(c.notes.some(n=>n
   if(b.hasAttribute("data-impyes")){ DB.clients=ui.imp; save(); ui={}; render(true); return toast("Clientes cargados"); }
 };
 
+/* ---------- rellenar un cliente nuevo a partir de una foto (lector con IA, la foto no se guarda) ---------- */
+let foto={st:"", url:"", msg:"", otros:"", code:""};
+function fotoReset(){ if(foto.url) URL.revokeObjectURL(foto.url); foto={st:"", url:"", msg:"", otros:"", code:""}; }
+function fotoStat(){
+  if(!foto.st) return "";
+  const img=foto.url?`<img src="${foto.url}" alt="Foto que se está leyendo">`:"";
+  if(foto.st==="leyendo") return `<div class="fstat">${img}<p><span class="spin"></span>Leyendo la foto…</p></div>`;
+  if(foto.st==="ok") return `<div class="fstat">${img}<div><p>✓ Listo. Revisa lo marcado en amarillo.</p>${foto.otros?`<p class="fo">También pone: ${esc(foto.otros)}<br>Se guardará como nota del cliente.</p>`:""}</div></div>`;
+  return `<div class="fstat">${img}<div><p class="err">${esc(foto.msg)}</p>${foto.code?`<p class="fo">Código del error: ${esc(foto.code)}</p>`:""}${foto.perm?`<button class="btn" data-fperm style="margin-top:8px">Dar permiso</button>`:""}</div></div>`;
+}
+function fotoBox(){
+  return `<section class="box foto">
+    <p class="ft">Rellenar con una foto</p>
+    <p class="hint">Tarjeta de visita, letrero, rótulo de furgoneta o ropa de trabajo. La foto solo se usa para leerla, no se guarda.</p>
+    <div class="row2"><label class="btn pri" for="fcam">${ICON.cam}Hacer foto</label><label class="btn" for="fgal">${ICON.img}Galería</label></div>
+    <input type="file" id="fcam" accept="image/*" capture="environment" hidden><input type="file" id="fgal" accept="image/*" hidden>
+    <div id="fstat">${fotoStat()}</div>
+  </section>`;
+}
+const FOTO_PROMPT=`Eres el lector de datos de una app comercial de un vendedor de persianas y perfiles de aluminio en Cataluña.
+En la imagen adjunta hay una tarjeta de visita, un letrero o rótulo de una empresa, una furgoneta rotulada o la ropa de trabajo de alguien.
+Saca los datos de contacto del negocio y responde SOLO con un objeto JSON con estas claves (texto, "" si no aparece; NO inventes nada):
+{"nombre": "nombre de la empresa o negocio", "contacto": "nombre de la persona, si aparece", "telefono": "el teléfono principal (si hay varios, preferir un móvil)", "email": "", "pueblo": "población, sin provincia ni código postal", "otros": "en una línea: otros teléfonos, web, dirección, actividad", "legible": true}
+Pon "legible": false si en la imagen no se puede leer ningún dato de contacto.`;
+async function fotoBlob(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
+    const k=Math.min(1,1400/Math.max(img.naturalWidth,img.naturalHeight)), cv=document.createElement("canvas");
+    cv.width=Math.round(img.naturalWidth*k); cv.height=Math.round(img.naturalHeight*k);
+    cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+    return await new Promise(res=>cv.toBlob(res,"image/jpeg",.85));
+  }catch(e){ if(/^image\/(jpeg|png|webp)$/.test(file.type) && file.size<4.5e6) return file; throw {msg:"No se puede abrir esta foto (formato no compatible). Hazla con la cámara o prueba con otra.", code:"decode:"+(file.type||"?")}; }
+  finally { URL.revokeObjectURL(url); }
+}
+const b64 = blob => new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(blob); });
+const jsonDe = t => { const m=String(t||"").match(/\{[\s\S]*\}/); if(!m) throw {msg:"La IA no ha devuelto datos.", code:"sin_json"}; return JSON.parse(m[0]); };
+async function fotoIA(blob){
+  /* en la versión de prueba (artefacto de Claude) se usa Claude directamente; en la app, la función «leer-tarjeta» de Supabase */
+  if(window.claude?.use){
+    const smp = await window.claude.use("sample").catch(()=>null);
+    if(!smp) throw {msg:"Aquí no se puede usar la IA. Abre la prueba en claude.ai desde el navegador (Chrome o Safari).", code:"sample_null"};
+    const perm = await window.claude.use("permissions").catch(()=>null);
+    if(perm && await perm.state("sample").catch(()=>"")==="denied") throw {msg:"El permiso para usar la IA está desactivado. Toca «Dar permiso» y actívalo.", code:"denied", perm:true};
+    const lim = await smp.limits().catch(()=>null);
+    if(!lim || !lim.images) throw {msg:"Este visor no deja enviar fotos a la IA. Abre la prueba en claude.ai desde el navegador.", code:"sin_imagenes"};
+    try{ return await smp.json(FOTO_PROMPT,{images:[blob]}); }
+    catch(e){
+      if(e && e.code==="invalid_json") return jsonDe(e.text);
+      const M={not_granted:"Hay que dar permiso para enviar la foto a Claude. Vuelve a probar y acepta el aviso.", rate_limited:"Demasiadas fotos seguidas. Espera un minuto y prueba otra vez.", image_rejected:"La IA no acepta esta foto. Prueba con otra o hazla con la cámara.", images_unavailable:"Este visor no deja enviar fotos a la IA."};
+      throw {msg:M[e&&e.code]||"No se ha podido leer la foto.", code:(e&&e.code)||String(e&&e.message||e), perm:(e&&e.code)==="not_granted"};
+    }
+  }
+  if(!sb) throw new Error("offline");
+  const {data,error}=await sb.functions.invoke("leer-tarjeta",{body:{image:await b64(blob), media_type:"image/jpeg"}});
+  if(error || (data && data.error)){ const st=error&&error.context&&error.context.status;
+    if(!error || /Functions(Http|Relay|Fetch)Error/.test(error.name||"")) throw {msg: st===404||!st&&!navigator.onLine===false ? "El lector de fotos todavía no está activado. De momento rellena los datos a mano." : "El lector de fotos no está disponible ahora. Prueba más tarde o rellénalo a mano.", code:(error&&error.name)+(st?" "+st:"")+(data&&data.error?" "+data.error:"")};
+    throw error; }
+  return data;
+}
+function matchPueblo(v){
+  const n=norm(v).replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim(); if(!n) return "";
+  const all=[...new Set([...Object.keys(PZ),...Object.keys(GEO),...DB.clients.map(c=>c.p)])];
+  return all.find(p=>norm(p).replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim()===n) || "";
+}
+function fotoFill(d){
+  const set=(id,v)=>{ v=String(v??"").trim(); const el=$(id); if(!v||!el) return; el.value=v; el.classList.add("ai"); };
+  set("f-n", d.nombre); set("f-r", d.contacto); set("f-t", d.telefono); set("f-e", String(d.email||"").toLowerCase());
+  const pm=matchPueblo(d.pueblo||"");
+  set("f-p", pm?title(pm):title(d.pueblo||""));
+  const z=pm&&PZ[pm]; if(z){ $("f-z").value=z; $("f-z").classList.add("ai"); }
+}
+async function fotoLeer(file){
+  if(!file) return;
+  fotoReset(); foto.st="leyendo"; foto.url=URL.createObjectURL(file); $("fstat").innerHTML=fotoStat();
+  try{
+    const d=await fotoIA(await fotoBlob(file));
+    if(!d || d.legible===false || !(d.nombre||d.telefono||d.email||d.contacto)) throw {msg:"No he podido leer datos en esta foto. Prueba con más luz, más cerca o más recta."};
+    fotoFill(d); foto.st="ok"; foto.otros=String(d.otros||"").trim();
+  }catch(e){ foto.st="err"; foto.code=(e&&e.code)||(e&&e.message)||""; foto.perm=!!(e&&e.perm); foto.msg = e&&e.msg ? e.msg : (navigator.onLine===false||String(e&&e.message)==="offline") ? "No hay conexión. Prueba otra vez cuando tengas cobertura." : "No se ha podido leer la foto. Prueba otra vez o rellénalo a mano."; console.warn("foto",e); }
+  if($("fstat")) $("fstat").innerHTML=fotoStat();
+}
+$("v").addEventListener("change", e=>{ if(e.target.id==="fcam"||e.target.id==="fgal"){ fotoLeer(e.target.files[0]); e.target.value=""; } });
+$("v").addEventListener("click", async e=>{ if(!e.target.closest("[data-fperm]")) return; const perm=await window.claude?.use?.("permissions").catch(()=>null); if(!perm) return toast("Activa el permiso desde el menú de permisos de la página");
+  try{ await perm.manage(); }catch(err){ toast("Activa el permiso desde el menú «Permisos» de esta página"); } });
+$("v").addEventListener("input", e=>{ if(e.target.classList?.contains("ai")) e.target.classList.remove("ai"); });
+
 function saveForm(id){
   const n=$("f-n").value.trim();
   if(!n){ $("f-err").hidden=false; $("f-n").focus(); return; }
   const p=$("f-p").value.trim().toUpperCase();
   const data={n, r:$("f-r").value.trim(), t:$("f-t").value.trim(), e:$("f-e").value.trim(), p, z:$("f-z").value||PZ[p]||"Fuera de zona", c:$("f-c").value.trim()};
   if(id){ Object.assign(byId(id),data); save(); stack.pop(); render(true); toast("Datos corregidos"); }
-  else { const nc={id:"n"+Date.now(), ...data, st:"pend", rec:"", notes:[], ord:[]}; DB.clients.push(nc); save(); tab="ruta"; stack=[{v:"zonas"},{v:"ficha",id:nc.id}]; ui={}; render(true); toast("Cliente añadido"); }
+  else { const nc={id:"n"+Date.now(), ...data, st:"pend", rec:"", notes:[], ord:[]};
+    if(foto.otros) nc.notes.push(newNote("Datos de la foto: "+foto.otros,"",false)); fotoReset(); DB.clients.push(nc); save(); tab="ruta"; stack=[{v:"zonas"},{v:"ficha",id:nc.id}]; ui={}; render(true); toast("Cliente añadido"); }
 }
 
 /* ---------- Excel ---------- */
@@ -1146,10 +1469,13 @@ async function exportXlsx(){
   XLSX.utils.book_append_sheet(wb,ws,"Clientes"); XLSX.utils.book_append_sheet(wb,wn,"Notas");
   const wp=XLSX.utils.json_to_sheet(peds.length?peds:[{"ID":"","Cliente":"","Fecha":"","Importe":"","Concepto":""}]); wp["!cols"]=[{wch:8},{wch:34},{wch:12},{wch:12},{wch:50}];
   XLSX.utils.book_append_sheet(wb,wp,"Pedidos");
+  const ahora=new Date(), cuando=ahora.toLocaleDateString("es-ES")+" "+ahora.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+  const wi=XLSX.utils.aoa_to_sheet([["Clientes Interlama"],["Excel hecho el",cuando],["Clientes",DB.clients.length],["Notas",notes.length],["Pedidos",peds.length]]); wi["!cols"]=[{wch:18},{wch:22}];
+  XLSX.utils.book_append_sheet(wb,wi,"Info");
   const buf=XLSX.write(wb,{bookType:"xlsx",type:"array"});
-  const t=today().split("-");
-  try{ await saveFile(`Clientes Interlama ${t[2]}-${t[1]}-${t[0]}.xlsx`, new Uint8Array(buf));
-    DB.lastExport=today(); save(); render(); toast("Excel descargado"); }
+  const t=today().split("-"), hm=ahora.toTimeString().slice(0,5).replace(":","h");
+  try{ await saveFile(`Clientes Interlama ${t[2]}-${t[1]}-${t[0]} ${hm}.xlsx`, new Uint8Array(buf));
+    DB.lastExport=today(); save(); render(); toast(`Excel descargado con ${DB.clients.length} clientes`); }
   catch(err){ toast(err&&err.code==="declined"?"Descarga cancelada":"No se pudo descargar el Excel"); }
 }
 const toIso = s => { const m=String(s||"").match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m?`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`:""; };
@@ -1169,7 +1495,8 @@ $("file").onchange=async e=>{
         notes:ns.filter(n=>String(n["ID"])===id && String(n["Nota"]).trim()).map(n=>({d:toIso(n["Fecha"]),t:String(n["Nota"]),av:toIso(n["Aviso"]),p:String(n["En avisos"]).toLowerCase()==="sí"})),
         ord: ps ? ps.filter(o=>String(o["ID"])===id && num(o["Importe"])>0).map(o=>({id:uuid(), d:toIso(o["Fecha"])||today(), imp:num(o["Importe"]), con:String(o["Concepto"]||"")})) : ((byId(id)||{}).ord||[])}; });
     if(!out.length) return toast("Ese Excel no tiene clientes");
-    ui.imp=out; ui.impName=f.name; render();
+    let fe=""; try{ const wi=wb.Sheets["Info"]; if(wi){ const r=XLSX.utils.sheet_to_json(wi,{header:1,raw:false}); const x=r.find(a=>a[0]==="Excel hecho el"); if(x) fe=String(x[1]||""); } }catch(e){}
+    ui.imp=out; ui.impName=f.name; ui.impFecha=fe; render();
   }catch(err){ toast("No se ha podido leer ese archivo"); }
 };
 
