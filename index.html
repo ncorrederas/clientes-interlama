@@ -1360,16 +1360,39 @@ En la imagen adjunta hay una tarjeta de visita, un letrero o rótulo de una empr
 Saca los datos de contacto del negocio y responde SOLO con un objeto JSON con estas claves (texto, "" si no aparece; NO inventes nada):
 {"nombre": "nombre de la empresa o negocio", "contacto": "nombre de la persona, si aparece", "telefono": "el teléfono principal (si hay varios, preferir un móvil)", "email": "", "pueblo": "población, sin provincia ni código postal", "otros": "en una línea: otros teléfonos, web, dirección, actividad", "legible": true}
 Pon "legible": false si en la imagen no se puede leer ningún dato de contacto.`;
+/* abre la foto (también las HEIC/HEIF de iPhone y algunos Samsung), la reduce y la pasa a JPEG */
+let heicP=null;
+function loadHEIC(){
+  if(window.heic2any) return Promise.resolve();
+  if(!heicP) heicP=new Promise((res,rej)=>{ const s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"; s.onload=res; s.onerror=()=>{heicP=null;rej();}; document.head.appendChild(s); });
+  return heicP;
+}
+async function abrirImg(blob){
+  if(window.createImageBitmap){ try{ return await createImageBitmap(blob); }catch(e){} }
+  const url=URL.createObjectURL(blob);
+  try{ return await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; }); }
+  finally{ setTimeout(()=>URL.revokeObjectURL(url),1000); }
+}
+async function aJpeg(img){
+  const w=img.naturalWidth||img.width, h=img.naturalHeight||img.height, k=Math.min(1,1400/Math.max(w,h)), cv=document.createElement("canvas");
+  cv.width=Math.max(1,Math.round(w*k)); cv.height=Math.max(1,Math.round(h*k));
+  cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+  const b=await new Promise(res=>cv.toBlob(res,"image/jpeg",.85)); if(!b) throw new Error("toBlob"); return b;
+}
 async function fotoBlob(file){
-  const url=URL.createObjectURL(file);
+  const esHeic=/hei[cf]/i.test(file.type||"") || /\.hei[cf]$/i.test(file.name||"");
+  if(!esHeic){ try{ return await aJpeg(await abrirImg(file)); }catch(e){ console.warn("foto normal",e); } }
+  /* HEIC o formato que el navegador no sabe abrir: se convierte a JPEG */
   try{
-    const img=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
-    const k=Math.min(1,1400/Math.max(img.naturalWidth,img.naturalHeight)), cv=document.createElement("canvas");
-    cv.width=Math.round(img.naturalWidth*k); cv.height=Math.round(img.naturalHeight*k);
-    cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
-    return await new Promise(res=>cv.toBlob(res,"image/jpeg",.85));
-  }catch(e){ if(/^image\/(jpeg|png|webp)$/.test(file.type) && file.size<4.5e6) return file; throw {msg:"No se puede abrir esta foto (formato no compatible). Hazla con la cámara o prueba con otra.", code:"decode:"+(file.type||"?")}; }
-  finally { URL.revokeObjectURL(url); }
+    await loadHEIC();
+    let j=await window.heic2any({blob:file, toType:"image/jpeg", quality:.85}); if(Array.isArray(j)) j=j[0];
+    try{ return await aJpeg(await abrirImg(j)); }catch(e){ if(j.size<4.5e6) return j; throw e; }
+  }catch(e){
+    console.warn("foto heic",e);
+    if(/^image\/(jpeg|png|webp)$/.test(file.type) && file.size<4.5e6) return file;
+    throw {msg: navigator.onLine===false ? "No hay conexión para preparar la foto. Prueba con cobertura." : "No se puede abrir esta foto. Hazla con el botón «Hacer foto» o prueba con otra.", code:"decode:"+(file.type||file.name||"?")};
+  }
 }
 const b64 = blob => new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(blob); });
 const jsonDe = t => { const m=String(t||"").match(/\{[\s\S]*\}/); if(!m) throw {msg:"La IA no ha devuelto datos.", code:"sin_json"}; return JSON.parse(m[0]); };
